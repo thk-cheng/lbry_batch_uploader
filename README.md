@@ -1,30 +1,38 @@
-# lbryscripts
+# LBRY Batch Uploader
 
-lbryscripts is a minimal python script that runs in command line and aims at assisting users in mass uploading videos to [LBRY](https://lbry.com/).\
-Please note that this is a forked repository, so any changes being made to the script would be mostly based on personal needs.\
-Full credit goes to [@paju1986](https://github.com/paju1986/lbryscripts) for developing the original script.
+A convenient and minimalistic batch uploader for [LBRY Desktop](https://lbry.com/get) written in Python.\
+For a detail specification of the LBRY protocol, please visit https://lbry.tech/ \
 
-## Prerequisite
-[ffmpeg](https://github.com/FFmpeg/FFmpeg) is required for thumbnail (.png) creation.\
-macOS users can install it with [Homebrew](https://brew.sh/):
+## Installation
+
+Install through pip
+
 ```bash
-brew install ffmpeg
+pip install lbry-batch-uploader
 ```
 
-## Usage (for macOS)
-1. First, make sure that the LBRY Desktop app is up and running. DO NOT CLOSE THE APP WHILE THE SCRIPT IS RUNNING.
+## Dependencies
 
-2. Then, open a new terminal window and cd into the designated directory that stores the videos:
+- [ffmpeg](https://github.com/FFmpeg/FFmpeg)
+
+## Usage
+
+### Unix-like (Linux/BSD/macOS)
+
+1. Make sure LBRY Desktop is up and running. **DO NOT CLOSE THE APP WHILE THE SCRIPT IS RUNNING**.
+
+2. Open a new terminal session and cd into the designated directory that stores the videos:
 ```bash
 cd "path/to/directory"
 ```
 
-3. Finally, run the script with the following command:
+3. Run the following command:
 ```bash
-python "path/to/script" -i [ID] -n [Name] -p [price_in_lbc] -b [bid_ammount] -t [tag1,tag2,...] -e [file_ext1,file_ext2,...]
+lbry-batch-uploader -i [ID] -n [Name] -p [price_in_lbc] -b [bid_ammount] -t [tag1,tag2,...] -e [file_ext1,file_ext2,...]
 ```
 
 ## Options
+
 ```
 -i, --channel_id ID                          Specify the channel's claim ID, used for determining the upload location 
 -n, --channel_name Name                      Specify the channel name, used for saving the uploaded video link
@@ -35,6 +43,10 @@ python "path/to/script" -i [ID] -n [Name] -p [price_in_lbc] -b [bid_ammount] -t 
 ```
 
 ## On-going Development
+
 - Detect and fix special characters in file names that LBRY doesn't allow (e.g. "@", "/", ":")
 - Custom description for each video
-- Connection with existing database
+
+## License
+
+This project is MIT licensed. For the full license, see [LICENSE](LICENSE).
