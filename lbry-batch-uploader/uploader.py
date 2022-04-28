@@ -1,17 +1,27 @@
 import os
+import subprocess
+
 import sys
 import getopt
+
 import requests
 import json
+
 import pandas as pd
+
+
+# Extract sanitized file name without extension
+def extract_file_name(file_name_with_ext: str) -> str:
+    name_parts = file_name_with_ext.split('.')[0:-1]
+    pass
 
 
 # Create automated thumbnails of the middle of the file
 def createAutomatedThumb(path, fileName, fileNameNoExtension):
     thumbName = fileNameNoExtension + ".png"
-    os.system("ffmpeg -i '" + path + "/" + fileName + "' -vcodec mjpeg -vframes 1 -an -f rawvideo -ss `ffmpeg -i '" + path + "/" + fileName +
-              "' 2>&1 | grep Duration | awk '{print $2}' | tr -d , | awk -F ':' '{print ($3+$2*60+$1*3600)/2}'` '" + path + "/" + thumbName + "'")
+
     return thumbName
+
 
 # Helper function for uploading thumbnail to spee.ch, returns something
 def uploadThumbnail(files, thumbnailParams):
@@ -25,6 +35,7 @@ def uploadThumbnail(files, thumbnailParams):
         returnJson = {"Error": "CannotUpload"}
 
     return returnJson
+
 
 # Helper function for uploading video to LBRY, returns the Json response (as a dictionary)
 def uploadFileLBRY(params):
