@@ -9,50 +9,43 @@ import json
 
 import pandas as pd
 
-
-# Extract sanitized file name without extension
-def extract_file_name(file_name_with_ext: str) -> str:
-    name_parts = file_name_with_ext.split('.')[0:-1]
-    pass
-
-
-# Create automated thumbnails of the middle of the file
-def createAutomatedThumb(path, fileName, fileNameNoExtension):
-    thumbName = fileNameNoExtension + ".png"
-
-    return thumbName
+from utils import get_file_name_no_ext, create_thumbnail
 
 
 # Helper function for uploading thumbnail to spee.ch, returns something
-def uploadThumbnail(files, thumbnailParams):
-    reqResult = requests.post(
-        "https://spee.ch/api/claim/publish", files=files, data=thumbnailParams)
+def upload_thumbnail(files, thumbnail_params):
+    req_result = requests.post(
+        "https://spee.ch/api/claim/publish",
+        files=files,
+        data=thumbnail_params
+    )
 
-    # process response from spee.ch api
-    if reqResult.status_code == 200:
-        returnJson = reqResult.json()
+    # Process response from spee.ch api
+    if req_result.status_code == 200:
+        return_json = reqResult.json()
     else:
-        returnJson = {"Error": "CannotUpload"}
+        return_json = {"Error": "CannotUpload"}
 
-    return returnJson
+    return return_json
 
 
 # Helper function for uploading video to LBRY, returns the Json response (as a dictionary)
-def uploadFileLBRY(params):
-    reqResult = requests.post("http://localhost:5279/", json.dumps(params))
+def upload_file_to_lbry(file_params):
+    req_result = requests.post(
+        "http://localhost:5279/",
+        json.dumps(file_params)
+    )
 
-    # process response from LBRYnet
-    if reqResult.status_code == 200:
-        returnJson = reqResult.json()
-        dumpJson = json.dumps(returnJson)
-        dictJson = json.loads(dumpJson)
+    # Process response from LBRYnet
+    if req_result.status_code == 200:
+        return_json = reqResult.json()
     else:
-        dictJson = {"Error": "CannotUpload"}
+        return_json = {"Error": "CannotUpload"}
 
-    return dictJson
+    return return_json
 
 
-if __name__ == '__main__':
+def main():
     # Initiate optional command line arguments
     channelId = ""
     channelName = ""
@@ -130,8 +123,7 @@ if __name__ == '__main__':
                         elif os.path.exists(path + "/" + fileNameNoExtension + ".jpg"):
                             thumbName = fileNameNoExtension + '.jpg'
                         else:
-                            thumbName = createAutomatedThumb(
-                                path, entry.name, fileNameNoExtension)
+                            thumbName = create_thumbnail(path, entry.name)
 
                         print("Created thumbnail for file: {}".format(
                             entry.name), end="\n\n")
@@ -150,7 +142,7 @@ if __name__ == '__main__':
                         while uploadNotSuccessful:
                             try:
                                 uploadNotSuccessful = False
-                                returnJson = uploadThumbnail(
+                                returnJson = upload_thumbnail(
                                     files, thumbnailParams)
                                 thumbUrl = returnJson["data"]["serveUrl"]
                             except KeyError:
@@ -197,7 +189,7 @@ if __name__ == '__main__':
                     while uploadNotSuccessful:
                         try:
                             uploadNotSuccessful = False
-                            dictJson = uploadFileLBRY(params)
+                            dictJson = upload_file_to_lbry(params)
                             tmp = dictJson["result"]
                         except KeyError:
                             uploadNotSuccessful = True
@@ -240,3 +232,7 @@ if __name__ == '__main__':
                     # Process completed for one video
                     print("Completed all processes for {}".format(
                         entry.name), end="\n\n")
+
+
+if __name__ == '__main__':
+    main()
