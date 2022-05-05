@@ -173,11 +173,6 @@ def _pipe_cmds(cmds: list[list[str]], *, prev_p: CompletedProcess = None) -> Com
 
 
 def main():
-    # file_name_with_ext = 'abc123-8724 [asd^1ashd@].webm'
-    # file_name_with_ext = '12.3-345 [askuf7asf].webm'
-    # file_name_with_ext = 123
-    # print(get_file_name_no_ext(file_name_with_ext))
-
     base_path = '/Users/kennethcheng/Downloads/lbry-upload/short-videos'
     file_name = 'Shortest Video on Youtube Part 1 [tPEE9ZwTmy0].webm'
     print(create_thumbnail(base_path, file_name))
