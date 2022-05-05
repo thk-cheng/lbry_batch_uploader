@@ -8,7 +8,7 @@ For a detail specification of the LBRY protocol, please visit https://lbry.tech/
 Install through pip
 
 ```bash
-pip install lbry-batch-uploader
+pip install lbry_batch_uploader
 ```
 
 ## Dependencies
@@ -28,7 +28,7 @@ cd "path/to/directory"
 
 3. Run the following command:
 ```bash
-lbry-batch-uploader -i [ID] -n [Name] -p [price_in_lbc] -b [bid_ammount] -t [tag1,tag2,...] -e [file_ext1,file_ext2,...]
+lbry_batch_uploader -i [ID] -n [Name] -p [price_in_lbc] -b [bid_ammount] -t [tag1,tag2,...] -e [file_ext1,file_ext2,...]
 ```
 
 ## Options
