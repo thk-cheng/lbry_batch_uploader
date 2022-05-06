@@ -1,6 +1,7 @@
 import os
 import subprocess
 from subprocess import PIPE, STDOUT, CompletedProcess
+import re
 
 
 class Error(Exception):
@@ -8,10 +9,16 @@ class Error(Exception):
     pass
 
 
-class PipeError(Error):
-    """Exception raised for error in piping commands."""
+class InsufficientDataError(Error):
+    """Exception raised when mandatory upload data is missing"""
     pass
- 
+
+
+class PipeError(Error):
+    """Exception raised for error in piping commands"""
+    pass
+
+
 # class ThumbnailCreationError(Error):
 #     """
 #     Exception raised for error in creating thumbnail from an input.
@@ -59,6 +66,29 @@ def get_file_name_no_ext(file_name_with_ext: str) -> str:
 
     # Join the parts back together with '.', as the original name may contain '.'
     return '.'.join(name_parts)
+
+
+def get_file_name_no_ext_clean(file_name_no_ext: str) -> str:
+    """
+    Clean the file name without extension so that no special characters exist
+
+    Parameters
+    ----------
+    file_name_no_ext: str
+        The name of input file without extension
+
+    Returns
+    -------
+    str
+        Cleaned version of the file name without extension
+    """
+
+    bad_chars_half = "!@#$%^&*()+={}|\:;'<\",>?/"
+    bad_chars_full = "！％……＊（）——『〖｛「【〔［〚〘』〗｝」】〕］〛〙·・｜、＼：；“‘《〈，》〉。？"
+    bad_chars = bad_chars_half + bad_chars_full
+    mapping = {bad_char: "-" for bad_char in bad_chars}
+
+    return file_name_no_ext.translate(mapping)
 
 
 # def create_thumbnail(base_path: str, file_name: str) -> str:
