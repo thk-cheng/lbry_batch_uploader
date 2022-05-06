@@ -1,8 +1,9 @@
 # LBRY Batch Uploader
 
 A convenient and minimalistic batch uploader for [LBRY Desktop](https://lbry.com/get) written in Python.\
-For a detail specification of the LBRY protocol, please visit https://lbry.tech/ \
+For a detail specification of the LBRY protocol, please visit https://lbry.tech/
 
+<!---
 ## Installation
 
 Install through pip
@@ -46,6 +47,13 @@ lbry_batch_uploader -i [ID] -n [Name] -p [price_in_lbc] -b [bid_ammount] -t [tag
 
 - Detect and fix special characters in file names that LBRY doesn't allow (e.g. "@", "/", ":")
 - Custom description for each video
+-->
+
+------
+
+# Work In Progress
+
+------
 
 ## License
 
