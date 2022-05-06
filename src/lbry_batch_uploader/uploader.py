@@ -1,36 +1,33 @@
 import os
-import subprocess
 import sys
 import getopt
-
 import requests
-import json
-import pandas as pd
 
-from utils import get_file_name_no_ext
+from utils import get_file_name_no_ext, get_file_name_no_ext_clean
+from utils import InsufficientDataError
+
 
 class Uploader:
     def __init__(self):
         pass
 
-    def upload_thumbnail(self, files, thumbnail_params):
+    def upload_thumbnail(self, thumbnail_params) -> dict:
         """Helper function for uploading thumbnail to spee.ch"""
         req_result = requests.post(
             "https://spee.ch/api/claim/publish",
-            files=files,
             data=thumbnail_params
         )  
         return self._check_response(req_result)
     
-    def upload_file_to_lbry(self, file_params):
+    def upload_file_to_lbry(self, file_params) -> dict:
         """Helper function for uploading file to LBRY"""
         req_result = requests.post(
             "http://localhost:5279/",
-            json.dumps(file_params)
+            data=file_params
         )    
         return self._check_response(req_result)
 
-    def _check_response(self, req_result, *, error_json=None):
+    def _check_response(self, req_result, *, error_json=None) -> dict:
         """Helper function for checking response from api"""
         status = req_result.status_code
         
@@ -40,49 +37,60 @@ class Uploader:
         return req_result.json() if status == 200 else error_json
 
 
-def main():
-    # Initiate optional command line arguments
-    channelId = ""
-    channelName = ""
-    price = ""
-    bid = "0.00001"
-    extExclude = []
+def parse_upload_data() -> dict:
+    """Parse upload data from command line arguments"""
+    # Initialize the upload data
+    upload_data = {
+        'channel_id': None,
+        'channel_name': None,
+        'price': 0,
+        'bid': 0.00001,
+        'tags': [],
+        'excluded_ext': [],
+        }
 
-    # Processing command line arguments
-    short_options = "i:n:p:b:t:e:"
-    long_options = ["channel_id=", "channel_name=",
-                    "price=", "bid=", "tags=", "exclude="]
+    # Set command line arguments
+    short_options = 'i:n:p:b:t:e:'
+    long_options = [
+        'channel_id=',
+        'channel_name=',
+        'price=',
+        'bid=',
+        'tags=',
+        'excluded_ext='
+        ]
+
+    # Loading command line arguments
     argument_list = sys.argv[1:]
-
     try:
         arguments, values = getopt.getopt(
-            argument_list, short_options, long_options)
+            argument_list,
+            short_options,
+            long_options
+            )
     except getopt.error as err:
         # Output error, and return with an error code
         print(str(err))
         sys.exit(2)
 
-    for current_argument, current_value in arguments:
-        if current_argument in ("-i", "--channel_id"):
-            channelId = current_value
-        elif current_argument in ("-n", "--channel_name"):
-            channelName = current_value
-        elif current_argument in ("-p", "--price"):
-            price = current_value
-        elif current_argument in ("-b", "--bid"):
-            bid = current_value
-        elif current_argument in ("-t", "--tags"):
-            tags = current_value.split(",")
-        elif current_argument in ("-e", "--exclude"):
-            extExclude = current_value.split(",")
+    # Check if mandatory upload data exists
+    id_exist = set(arguments) & {'-i', '--channel_id'}
+    name_exist = set(arguments) & {'-n', '--channel_name'}
+    if (not id_exist) or (not name_exist):
+        err_str = 'Both channel_id and channel_name must be specified.'
+        raise InsufficientDataError(err_str)
 
-    print("Channel ID = {}".format(channelId), end="\n")
-    print("Channel Name = {}".format(channelName), end="\n")
-    print("Price = {}".format(price), end="\n")
-    print("Bid = {}".format(bid), end="\n")
-    print("Tags = {}".format(tags), end="\n")
-    print("Excluded file extension = {}".format(extExclude), end="\n\n")
+    # Store the upload data
+    for arg, val in zip(arguments, values):
+        if arg in ('-t', '--tags', '-e', '--excluded_ext'):
+            upload_data.update(arg, val.split(','))
+        else:
+            upload_data.update(arg, val)
 
+    return upload_data
+
+
+def main():
     # Scan current directory (should be the directory that contains all videos)
     path = os.getcwd()
 
@@ -91,142 +99,83 @@ def main():
         for entry in entries:
             # Check whether the entry is a file or not
             if entry.is_file():
-                thumbUrl = ""
-                splitedName = entry.name.split(".")
+                file_name_with_ext = entry.name
+                file_ext = file_name_with_ext.split(".")[-1]
 
                 # Check the file extension to see whether it should be processed or not
-                if not splitedName[-1] in extExclude:
-                    # Join back by "." in case the original file name contains the character "."
-                    fileNameNoExtension = '.'.join(splitedName[0:-1])
+                if not (file_ext in excluded_ext):
+                    file_name_no_ext = get_file_name_no_ext(file_name_with_ext)
+                    file_name_no_ext_clean = get_file_name_no_ext_clean(file_name_no_ext)
 
-                    # Create a "clean" version of the file name, i.e. without any forbidden characters,
-                    # that will be used as the name of the video attached to the URL
-                    fileNameNoExtension_clean = fileNameNoExtension.replace(
-                        " ", "").replace("(", "").replace(")", "").replace(
-                        "?", "").replace("@", "").replace(".", "").replace(
-                        "/", "").replace(":", "").replace("#", "").replace(
-                        ";", "").replace("：", "").replace("，", "").replace(
-                        "‧", "").replace("[", "").replace("]", "")
+                    thumbnail_name = f'{file_name_no_ext}.png'
+                    thumbnail_path = os.path.join(path, f'{file_name_no_ext}.png')
+                    with open(thumbnail_path, 'rb') as f:
+                        thumbnail = f.read()
 
-                    # Create a thumbnail for the video (only for mp4 or mkv files)
-                    if len(splitedName) > 1 and (splitedName[-1] == "mp4" or splitedName[-1] == "mkv"):
-                        print("Creating thumbnail for file: {}".format(
-                            entry.name), end="\n")
-
-                        if os.path.exists(path + "/" + fileNameNoExtension + ".png"):
-                            thumbName = fileNameNoExtension + '.png'
-                        elif os.path.exists(path + "/" + fileNameNoExtension + ".jpg"):
-                            thumbName = fileNameNoExtension + '.jpg'
-                        else:
-                            thumbName = create_thumbnail(path, entry.name)
-
-                        print("Created thumbnail for file: {}".format(
-                            entry.name), end="\n\n")
-
-                        # Prepare json to send to spee.ch
-                        thumbnailParams = {
-                            "name": thumbName
-                        }
-                        files = {
-                            'file': open(path + "/" + thumbName, 'rb')
+                    # Prepare json to send to spee.ch
+                    thumbnail_params = {
+                        'name': thumbnail_name,
+                        'file': thumbnail,
                         }
 
-                        # Upload thumbnail to spee.ch
-                        print("Uploading thumbnail to spee.ch...", end="\n")
-                        uploadNotSuccessful = True
-                        while uploadNotSuccessful:
-                            try:
-                                uploadNotSuccessful = False
-                                returnJson = upload_thumbnail(
-                                    files, thumbnailParams)
-                                thumbUrl = returnJson["data"]["serveUrl"]
-                            except KeyError:
-                                uploadNotSuccessful = True
-                                print(
-                                    "Upload thumbnail not successful, retrying...")
-                        print("Uploaded thumbnail for file: {}".format(
-                            entry.name), end="\n\n")
+                    # Upload thumbnail to spee.ch
+                    print(f'Uploading thumbnail for {file_name_with_ext} to spee.ch...', end='\n')
+                    upload_not_successful = True
+                    while upload_not_successful:
+                        try:
+                            upload_not_successful = False
+                            thumbnail_json = upload_thumbnail(thumbnail_params)
+                        except KeyError:
+                            upload_not_successful = True
+                            print('Upload thumbnail not successful, retrying...')
 
-                        # Remove the thumbnail to free up memory
-                        os.remove(path + "/" + thumbName)
+                    thumbnail_url = thumbnail_json['data']['serveUrl']
+                    print(f'Uploaded thumbnail for {file_name_with_ext}', end='\n')
+                    print(f'thumbnail_url: {thumbnail_url}', end='\n')
 
                     # Prepare json to send to lbrynet api
-                    params = {
-                        "method": "publish",
-                        "params": {
-                            "name": fileNameNoExtension_clean,
-                            "title": fileNameNoExtension,
-                            "bid": bid,
-                            "file_path": path + "/" + entry.name,
-                            "validate_file": False,
-                            "optimize_file": False,
-                            "tags": [],
-                            "languages": [],
-                            "locations": [],
-                            "thumbnail_url": thumbUrl,
-                            "funding_account_ids": [],
-                            "preview": False,
-                            "blocking": False
-                        }
+                    file_params = {
+                        'method': 'publish',
+                        'params': {
+                            'name': file_name_no_ext_clean,
+                            'title': file_name_no_ext,
+                            'bid': bid,
+                            'file_path': os.path.join(path, file_name_with_ext),
+                            'validate_file': False,
+                            'optimize_file': False,
+                            'tags': [],
+                            'languages': [],
+                            'locations': [],
+                            'thumbnail_url': thumbnail_url,
+                            'funding_account_ids': [],
+                            'preview': False,
+                            'blocking': False,
+                        },
                     }
-                    if(len(channelId) != 0):
-                        params["params"]["channel_id"] = channelId
+                    if(len(channel_id) != 0):
+                        params['params']['channel_id'] = channel_id
                     if(len(price) != 0):
-                        params["params"]["fee_currency"] = "lbc"
-                        params["params"]["fee_amount"] = price
+                        params['params']['fee_currency'] = 'lbc'
+                        params['params']['fee_amount'] = price
                     if(len(tags) != 0):
-                        params["params"]["tags"] = tags
+                        params['params']['tags'] = tags
 
                     # Upload video to lbrynet
-                    print("Uploading video {} to LBRY".format(
-                        entry.name), end="\n")
-                    uploadNotSuccessful = True
-                    while uploadNotSuccessful:
+                    print(f'Uploading video {file_name_with_ext} to LBRY', end='\n')
+                    upload_not_successful = True
+                    while upload_not_successful:
                         try:
-                            uploadNotSuccessful = False
-                            dictJson = upload_file_to_lbry(params)
-                            tmp = dictJson["result"]
+                            upload_not_successful = False
+                            file_json = upload_file_to_lbry(params)
                         except KeyError:
-                            uploadNotSuccessful = True
-                            print("Upload video not successful, retrying...")
+                            upload_not_successful = True
+                            print('Upload video not successful, retrying...')
 
-                    header = "https://odysee.com/@" + channelName + "/"
-                    perm_uri = dictJson["result"]["outputs"][0]["permanent_url"].replace(
-                        "lbry://", header)
-                    print("Uploaded video {} to LBRY".format(
-                        entry.name), end="\n\n")
-
-                    # Save metadata to csv file
-                    if os.path.exists(path + "/" + "lbry_link.csv"):
-                        df_lbry = pd.read_csv(path + "/" + "lbry_link.csv")
-
-                        df_lbry = df_lbry.append({
-                            "epid_title": fileNameNoExtension,
-                            "epid_backup_link": perm_uri
-                        }, ignore_index=True)
-
-                        df_lbry.to_csv(
-                            path + "/" + "lbry_link.csv", index=False)
-                        print("Updated lbry_link.csv for {}".format(
-                            entry.name), end="\n\n")
-
-                    else:
-                        df_lbry = pd.DataFrame(
-                            columns=["epid_title", "epid_backup_link"])
-
-                        df_lbry = df_lbry.append({
-                            "epid_title": fileNameNoExtension,
-                            "epid_backup_link": perm_uri
-                        }, ignore_index=True)
-
-                        df_lbry.to_csv(
-                            path + "/" + "lbry_link.csv", index=False)
-                        print("Created and updated lbry_link.csv for {}".format(
-                            entry.name), end="\n\n")
-
-                    # Process completed for one video
-                    print("Completed all processes for {}".format(
-                        entry.name), end="\n\n")
+                    header = f'https://odysee.com/@{channel_name}/'
+                    file_url = file_json['result']['outputs'][0]['permanent_url']
+                    file_url = file.url.replace('lbry://', header)
+                    print(f'Uploaded video {file_name_with_ext} to LBRY', end='\n')
+                    print(f'file_url: {file_url}', end='\n\n')
 
 
 if __name__ == '__main__':
