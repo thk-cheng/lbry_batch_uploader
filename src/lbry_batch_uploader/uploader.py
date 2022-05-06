@@ -1,48 +1,43 @@
 import os
 import subprocess
-
 import sys
 import getopt
 
 import requests
 import json
-
 import pandas as pd
 
-from utils import get_file_name_no_ext, create_thumbnail
+from utils import get_file_name_no_ext
 
+class Uploader:
+    def __init__(self):
+        pass
 
-# Helper function for uploading thumbnail to spee.ch, returns something
-def upload_thumbnail(files, thumbnail_params):
-    req_result = requests.post(
-        "https://spee.ch/api/claim/publish",
-        files=files,
-        data=thumbnail_params
-    )
+    def upload_thumbnail(self, files, thumbnail_params):
+        """Helper function for uploading thumbnail to spee.ch"""
+        req_result = requests.post(
+            "https://spee.ch/api/claim/publish",
+            files=files,
+            data=thumbnail_params
+        )  
+        return self._check_response(req_result)
+    
+    def upload_file_to_lbry(self, file_params):
+        """Helper function for uploading file to LBRY"""
+        req_result = requests.post(
+            "http://localhost:5279/",
+            json.dumps(file_params)
+        )    
+        return self._check_response(req_result)
 
-    # Process response from spee.ch api
-    if req_result.status_code == 200:
-        return_json = reqResult.json()
-    else:
-        return_json = {"Error": "CannotUpload"}
+    def _check_response(self, req_result, *, error_json=None):
+        """Helper function for checking response from api"""
+        status = req_result.status_code
+        
+        if error_json is None:
+            error_json = {'Error': status}
 
-    return return_json
-
-
-# Helper function for uploading video to LBRY, returns the Json response (as a dictionary)
-def upload_file_to_lbry(file_params):
-    req_result = requests.post(
-        "http://localhost:5279/",
-        json.dumps(file_params)
-    )
-
-    # Process response from LBRYnet
-    if req_result.status_code == 200:
-        return_json = reqResult.json()
-    else:
-        return_json = {"Error": "CannotUpload"}
-
-    return return_json
+        return req_result.json() if status == 200 else error_json
 
 
 def main():
