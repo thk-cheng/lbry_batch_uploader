@@ -2,7 +2,6 @@ import os
 from parser import Parser
 from uploader import Uploader
 from utils import get_file_name_no_ext, get_file_name_no_ext_clean
-from utils import InsufficientDataError
 
 
 def main():
