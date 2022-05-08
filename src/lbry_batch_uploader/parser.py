@@ -32,6 +32,14 @@ class Parser:
             )
 
         self.parser.add_argument(
+                "--port",
+                default=5279,
+                type=int,
+                help="""The port that lbrynet listens to, \
+                        default to 5279 if not specified."""
+            )
+
+        self.parser.add_argument(
             "--bid",
             default=0.0001,
             type=float,
@@ -78,7 +86,20 @@ class Parser:
                 metavar="LICENSE"
             )
 
+        self.parser.add_argument(
+                "--license-url",
+                type=str,
+                help="""The url of custom license. \
+                        This option should be specified \
+                        if and only if --license='Other'."""
+            )
+
         self.args = self.parser.parse_args()
+
+        if ((self.args.license == "Other") and (self.args.license_url is None)) or \
+                ((self.args.license != "Other") and (self.args.license_url is not None)):
+            err_msg = "--license-url should be specified if and only if --license='Other'"
+            self.parser.error(err_msg)
 
 
 if __name__ == "__main__":

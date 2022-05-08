@@ -248,6 +248,7 @@ LICENSES = [
     'Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International',
     'Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International',
     'Copyrighted (All rights reserved)',
+    'Other',
     ]
 
 
