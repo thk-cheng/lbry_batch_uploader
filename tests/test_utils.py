@@ -81,4 +81,3 @@ class TestGetFileNameNoExtClean:
 #         # cmd_3 = ["tr", "-d", ","]
 #         # cmd_4 = ["awk", "-F", ":", "{print ($3+$2*60+$1*3600)/2}"]
 #         pass
-
