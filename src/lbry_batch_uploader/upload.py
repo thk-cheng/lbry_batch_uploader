@@ -1,7 +1,7 @@
 import os
-from parser import Parser
-from uploader import Uploader
-from utils import get_file_name_no_ext, get_file_name_no_ext_clean
+from lbry_batch_uploader.parser import Parser
+from lbry_batch_uploader.uploader import Uploader
+from lbry_batch_uploader.utils import get_file_name_no_ext, get_file_name_no_ext_clean
 
 
 def main():
