@@ -19,7 +19,8 @@ class Parser:
 
         is_other = self.args.license == "Other"
         if (is_other and (self.args.license_url is None)) or \
-            (is_other and (self.args.license_url is not None)):
+            (not is_other and (self.args.license_url is not None)):
+            del self.args
             err_msg = "--license-url should be specified " + \
                         "if and only if --license='Other'"
             self.argparser.error(err_msg)
