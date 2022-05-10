@@ -1,18 +1,26 @@
 import pytest
 from lbry_batch_uploader.parser import Parser
+from typing import Optional, Sequence
 
 
 @pytest.fixture
-def parser():
+def parser() -> Parser:
+    """pytest fixture for creating a Parser instance."""
     return Parser()
 
 
-def assert_namespace(
-    p,
-    file_directory, channel_name,
-    optimize_file, port, bid, fee_amount,
-    tags, languages, license, license_url
-):
+def assert_namespace(p: Parser,
+                    file_directory: str,
+                    channel_name: str,
+                    optimize_file: bool,
+                    port: int,
+                    bid: float,
+                    fee_amount: float,
+                    tags: list,
+                    languages: list,
+                    license: Optional[str],
+                    license_url: Optional[str]) -> None:
+    """Helper function for asserting namespace."""
     assert p.args.file_directory == file_directory
     assert p.args.channel_name == channel_name
 
@@ -39,15 +47,19 @@ def assert_namespace(
 
 
 class TestPositionalArgs:
-    @pytest.mark.parametrize(
-        "args",
-        [("path/to/dir", "test_ch")]
-    )
-    def test_pos_args_all(self, parser, args, capsys):
+    """Tests related to positional arguments."""
+
+    @pytest.mark.parametrize("args", [("path/to/dir", "test_ch")])
+    def test_pos_args_all(self,
+                        parser: Parser,
+                        args: Sequence[str],
+                        capsys: pytest.CaptureFixture) -> None:
+        """Test when both positional arguments are present."""
         parser.parse(args)
 
         captured = capsys.readouterr()
-        assert (captured.out == "") and (captured.err == "")
+        assert captured.out == ""
+        assert captured.err == ""
 
         assert_namespace(
             parser,
@@ -65,7 +77,11 @@ class TestPositionalArgs:
             ("path/to/dir", "--bid", "0.5")
         ]
     )
-    def test_pos_args_missing(self, parser, args, capsys):
+    def test_pos_args_missing(self,
+                            parser: Parser,
+                            args: Sequence[str],
+                            capsys: pytest.CaptureFixture) -> None:
+        """Test when only zero/one positional argument is present."""
         with pytest.raises(SystemExit):
             parser.parse(args)
 
@@ -84,11 +100,14 @@ class TestPositionalArgs:
 
 
 class TestHelpOption:
-    @pytest.mark.parametrize(
-        "args",
-        ["-h", "--help"]
-    )
-    def test_help(self, parser, args, capsys):
+    """Tests related to the help option."""
+
+    @pytest.mark.parametrize("args", ["-h", "--help"])
+    def test_help(self,
+                parser: Parser,
+                args: Sequence[str],
+                capsys: pytest.CaptureFixture) -> None:
+        """Test when the help option is specified."""
         with pytest.raises(SystemExit):
             parser.parse([args])
 
