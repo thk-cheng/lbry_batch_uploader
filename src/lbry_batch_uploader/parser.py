@@ -1,24 +1,31 @@
-# import sys
 from argparse import ArgumentParser
 from lbry_batch_uploader.utils import RFC5646_LANGUAGE_TAGS, LICENSES
+from typing import Sequence
 
 
 class Parser:
-    def __init__(self):
+    """Class for a customized argument parser."""
+
+    def __init__(self) -> None:
+        """Initialize the Parser instance."""
         self.argparser = ArgumentParser(
             description="Batch uploader for LBRY Desktop"
-            )
+        )
         self._add_args()
 
-    def parse(self, cmd_args):
+    def parse(self, cmd_args: Sequence[str]) -> None:
+        """Parse arguments from the command line."""
         self.args = self.argparser.parse_args(cmd_args)
 
-        if ((self.args.license == "Other") and (self.args.license_url is None)) or \
-                ((self.args.license != "Other") and (self.args.license_url is not None)):
-            err_msg = "--license-url should be specified if and only if --license='Other'"
+        is_other = self.args.license == "Other"
+        if (is_other and (self.args.license_url is None)) or \
+            (is_other and (self.args.license_url is not None)):
+            err_msg = "--license-url should be specified " + \
+                        "if and only if --license='Other'"
             self.argparser.error(err_msg)
 
-    def _add_args(self):
+    def _add_args(self) -> None:
+        """Add arguments to the Parser instance."""
         self.argparser.add_argument(
             "file_directory",
             type=str,
@@ -108,6 +115,7 @@ class Parser:
 
 # def main():
 #     """Usage"""
+#     import sys
 #     parser = Parser()
 #     parser.parse(sys.argv[1:])
 #     args = parser.args
