@@ -252,12 +252,15 @@ LICENSES = [
 
 
 class Error(Exception):
-    """Base class for other exceptions"""
+    """Base class for other exceptions."""
     pass
 
+class ConnectionError(Exception):
+    """Exception raised for error in connecting with lbrynet."""
+    pass
 
 class PipeError(Error):
-    """Exception raised for error in piping commands"""
+    """Exception raised for error in piping commands."""
     pass
 
 
@@ -325,7 +328,7 @@ def get_file_name_no_ext_clean(file_name_no_ext: str) -> str:
         Cleaned version of the file name without extension
     """
 
-    bad_chars_half = "!@#$%^&*()+=}{|:;'<,>?/" + '"' + "\\"
+    bad_chars_half = "!@#$%^&*()_+=}{|:;'<,>?/" + '"' + "\\"
     bad_chars_full = """！％……＊（）——『〖｛「【〔［ \
                         〚〘』〗｝」】〕］〛〙·・｜、\
                         ＼：；“‘《〈，》〉。？"""
