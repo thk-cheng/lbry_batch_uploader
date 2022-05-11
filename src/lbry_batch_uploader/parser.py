@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
-from lbry_batch_uploader.utils import RFC5646_LANGUAGE_TAGS, LICENSES
 from typing import Sequence
+
+from utils import RFC5646_LANGUAGE_TAGS, LICENSES
 
 
 class Parser:
@@ -60,16 +61,16 @@ class Parser:
 
         self.argparser.add_argument(
             "--bid",
-            default=0.0001,
-            type=float,
+            default="0.0001",
+            type=str,
             help="""The amount to back the claim, \
                     default to 0.0001 if not specified."""
             )
 
         self.argparser.add_argument(
             "--fee-amount",
-            default=0.,
-            type=float,
+            default="0",
+            type=str,
             help="""The content download fee in LBC, \
                     default to 0 if not specified."""
             )
