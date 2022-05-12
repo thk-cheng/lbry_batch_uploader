@@ -1,7 +1,6 @@
 from argparse import ArgumentParser
 from typing import Sequence
-
-from utils import RFC5646_LANGUAGE_TAGS, LICENSES
+from .utils import RFC5646_LANGUAGE_TAGS, LICENSES
 
 
 class Parser:
