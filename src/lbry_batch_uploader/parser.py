@@ -19,10 +19,10 @@ class Parser:
 
         is_other = self.args.license == "Other"
         if (is_other and (self.args.license_url is None)) or \
-            (not is_other and (self.args.license_url is not None)):
+                (not is_other and (self.args.license_url is not None)):
             del self.args
             err_msg = "--license-url should be specified " + \
-                        "if and only if --license='Other'"
+                      "if and only if --license='Other'"
             self.argparser.error(err_msg)
 
     def _add_args(self) -> None:
@@ -112,15 +112,3 @@ class Parser:
                         This option should be specified \
                         if and only if --license='Other'."""
             )
-
-
-# def main():
-#     """Usage"""
-#     import sys
-#     parser = Parser()
-#     parser.parse(sys.argv[1:])
-#     args = parser.args
-
-
-if __name__ == "__main__":
-    pass

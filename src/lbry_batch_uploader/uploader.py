@@ -2,8 +2,11 @@ import os
 import time
 import requests
 from argparse import Namespace
-from .utils import get_file_name_no_ext, get_file_name_no_ext_clean
-from .utils import ConnectionError
+from .utils import (
+    get_file_name_no_ext,
+    get_file_name_no_ext_clean,
+    ConnectionError
+)
 
 
 class Uploader:
@@ -15,21 +18,29 @@ class Uploader:
         self.port_url = f"http://localhost:{args.port}/"
 
         files_name_all = os.listdir(self.base_path)
-        self.files_name_valid = self._get_valid_files(files_name_all)
+        files_name_valid = self._get_valid_files(files_name_all)
         files_name_valid_no_ext = [
-            get_file_name_no_ext(name) for name in self.files_name_valid
+            get_file_name_no_ext(name) for name in files_name_valid
         ]
 
-        self.files_valid = {
-            file_name_no_ext: {
-                "file_name": file_name,
-                "desc_name": None,
-                "thumbnail_name": None,
-            } for file_name, file_name_no_ext in \
-                zip(self.files_name_valid, files_name_valid_no_ext)
-        }
-        self._get_valid_descriptions(files_name_all)
-        self._get_valid_thumbnails(files_name_all)
+        self.files_valid: dict[str, dict[str, str]] = {}
+        for fn, fn_no_ext in zip(files_name_valid, files_name_valid_no_ext):
+            self.files_valid[fn_no_ext] = {
+                "file_name": fn,
+                "desc_name": "",
+                "thumbnail_name": "",
+            }
+
+        self._get_valid_ftypes(
+            files_name_all,
+            "descriptions",
+            ("txt", "description")
+        )
+        self._get_valid_ftypes(
+            files_name_all,
+            "thumbnails",
+            ("gif", "jpg", "png")
+        )
 
         self.base_params = {
             "channel_name": args.channel_name,
@@ -40,7 +51,6 @@ class Uploader:
             "tags": args.tags,
             "languages": args.languages,
             "license": args.license,
-            "funding_account_ids": [],
             "preview": False,
             "blocking": False,
         }
@@ -61,7 +71,7 @@ class Uploader:
                 file_name = params["file_name"]
             file_params["file_path"] = os.path.join(self.base_path, file_name)
 
-            if params["desc_name"] is not None:
+            if params["desc_name"]:
                 full_path = os.path.join(
                     self.base_path,
                     params["desc_name"]
@@ -69,7 +79,7 @@ class Uploader:
                 with open(full_path, "r") as f:
                     file_params["description"] = f.read()
 
-            if params["thumbnail_name"] is not None:
+            if params["thumbnail_name"]:
                 full_path = os.path.join(
                     self.base_path,
                     params["thumbnail_name"]
@@ -82,23 +92,13 @@ class Uploader:
             claim_id = self._upload_file(file_params)
             claim_url = f"lbry://{file_params['name']}#{claim_id}"
             upload_msg = f"Sucessfully uploaded {params['file_name']}\n" + \
-                            f"The claim id is {claim_id}\n" + \
-                            f"The claim url is {claim_url}"
+                         f"The claim id is {claim_id}\n" + \
+                         f"The claim url is {claim_url}"
             print(upload_msg, end="\n\n")
 
             if idx != len(self.files_valid) - 1:
                 print("Wait 10 seconds to space out uploads...", end="\n\n")
                 time.sleep(10)
-
-    def _get_valid_descriptions(self, files_name_all) -> None:
-        """Get all valid descriptions for the corresponding files, if any."""
-        target_ext = ("txt", "description")
-        for name_no_ext in self.files_valid.keys():
-            target_desc_names = [f"{name_no_ext}.{ext}" for ext in target_ext]
-            for desc_name in target_desc_names:
-                if desc_name in files_name_all:
-                    self.files_valid[name_no_ext]["desc_name"] = desc_name
-                    break
 
     def _get_valid_files(self, files_name_all) -> list[str]:
         """Get all valid files for upload in the specified directory."""
@@ -110,55 +110,66 @@ class Uploader:
                 files_name_valid.append(name)
         return sorted(files_name_valid)
 
-    def _get_valid_thumbnails(self, files_name_all) -> None:
-        """Get all valid thumbnails for the corresponding files, if any."""
-        target_ext = ("gif", "jpg", "png")
-        for name_no_ext in self.files_valid.keys():
-            target_t_names = [f"{name_no_ext}.{ext}" for ext in target_ext]
-            for t_name in target_t_names:
-                if t_name in files_name_all:
-                    self.files_valid[name_no_ext]["thumbnail_name"] = t_name
+    def _get_valid_ftypes(self, files_name_all, f_type, target_ext) -> None:
+        """Get all valid desc/thumbnails for the corresponding files."""
+        if (f_type != "descriptions") and (f_type != "thumbnails"):
+            err_msg = "Only support getting thumbnails or descriptions."
+            raise ValueError(err_msg)
+
+        for name_no_ext, finfos in self.files_valid.items():
+            target_names = [f"{name_no_ext}.{ext}" for ext in target_ext]
+            for name in target_names:
+                if name in files_name_all:
+                    if f_type == "descriptions":
+                        finfos["desc_name"] = name
+                    else:
+                        finfos["thumbnail_name"] = name
                     break
 
     def _has_ffmpeg(self) -> bool:
         """Helper function for verifying proper configuration of ffmpeg."""
         json = {"method": "ffmpeg_find"}
-        req_result = self._post_req(json=json)["result"]
-        if not req_result["available"]:
+        req_result: dict = self._post_req(json=json)["result"]
+        req_result_avail: bool = req_result["available"]
+
+        if not req_result_avail:
             msg = "ffmpeg is not configured properly." + \
                     "--optimize-file set to False."
             print(msg)
-        return req_result["available"]
 
-    def _post_req(self, port=None, **kwargs) -> dict[str, str]:
+        return req_result_avail
+
+    def _post_req(self, port: str = "", **kwargs) -> dict:
         """Helper function for submitting post request."""
-        if port is None:
+        if not port:
             port = self.port_url
 
         try:
-            return requests.post(port, **kwargs).json()
+            req_json: dict = requests.post(port, **kwargs).json()
+            return req_json
         except ConnectionRefusedError:
             msg = "Please check that LBRY Desktop is up and running " + \
                     "with a properly configured port (default to 5279)."
             raise ConnectionError(msg) from None
 
-    def _upload_file(self, file_params: dict) -> [str, str]:
+    def _upload_file(self, file_params: dict) -> str:
         """Upload a single file to LBRY, return claim id."""
         json = {"method": "publish", "params": file_params}
         req_result = self._post_req(json=json)["result"]
-        req_result_outputs = req_result["outputs"][0]
-        return req_result_outputs["claim_id"]
+        claim_id: str = req_result["outputs"][0]["claim_id"]
+        return claim_id
 
     def _upload_thumbnail(self, t_name: str, t_path: str) -> str:
         """Upload a single thumbnail to spee.ch, return thumbnail url."""
         with open(t_path, "rb") as f:
             thumbnail = f.read()
-        req_data = self._post_req(
+        req_json = self._post_req(
             port="https://spee.ch/api/claim/publish",
             files={"file": thumbnail},
             data={"name": t_name}
-        )["data"]
-        return req_data["serveUrl"]
+        )
+        thumbnail_url: str = req_json["data"]["serveUrl"]
+        return thumbnail_url
 
 
 if __name__ == "__main__":
