@@ -1,6 +1,10 @@
 import pytest
-from lbry_batch_uploader.utils import get_file_name_no_ext, get_file_name_no_ext_clean
-# from lbry_batch_uploader.utils import _pipe_cmds, PipeError
+from lbry_batch_uploader.utils import (
+    get_file_name_no_ext,
+    get_file_name_no_ext_clean,
+    _pipe_cmds,
+    PipeError
+)
 
 
 class TestGetFileNameNoExt:
@@ -53,31 +57,32 @@ class TestGetFileNameNoExtClean:
         assert get_file_name_no_ext_clean(file_name_no_ext) == file_name_no_ext_clean
 
 
-# class TestPipeCmds:
-#     def test_type_error(self):
-#         cmds = "ls"
-#         with pytest.raises(TypeError, match="cmds must be a list"):
-#             p = _pipe_cmds(cmds)
-#
-#     def test_pipe_error_case_tt(self):
-#         cmds = ["ls"]
-#         with pytest.raises(PipeError, match="At least two commands are needed for piping"):
-#             p = _pipe_cmds(cmds)
-#
-#     def test_pipe_error_case_tf(self):
-#         cmds = ["ls", "-l"]
-#         with pytest.raises(PipeError, match="At least two commands are needed for piping"):
-#             p = _pipe_cmds(cmds)
-#
-#     def test_pipe_error_case_ft(self):
-#         cmds = [["ls"]]
-#         with pytest.raises(PipeError, match="At least two commands are needed for piping"):
-#             p = _pipe_cmds(cmds)
-#
-#     def test_pipe_cmds(self):
-#         # cmd_0 = ["ffmpeg", "-i", file_name_absolute]
-#         # cmd_1 = ["grep", "Duration"]
-#         # cmd_2 = ["awk", "{print $2}"]
-#         # cmd_3 = ["tr", "-d", ","]
-#         # cmd_4 = ["awk", "-F", ":", "{print ($3+$2*60+$1*3600)/2}"]
-#         pass
+@pytest.mark.skip(reason="The tested function is not in used for now.")
+class TestPipeCmds:
+    def test_type_error(self):
+        cmds = "ls"
+        with pytest.raises(TypeError, match="cmds must be a list"):
+            p = _pipe_cmds(cmds)
+
+    def test_pipe_error_case_tt(self):
+        cmds = ["ls"]
+        with pytest.raises(PipeError, match="At least two commands are needed for piping"):
+            p = _pipe_cmds(cmds)
+
+    def test_pipe_error_case_tf(self):
+        cmds = ["ls", "-l"]
+        with pytest.raises(PipeError, match="At least two commands are needed for piping"):
+            p = _pipe_cmds(cmds)
+
+    def test_pipe_error_case_ft(self):
+        cmds = [["ls"]]
+        with pytest.raises(PipeError, match="At least two commands are needed for piping"):
+            p = _pipe_cmds(cmds)
+
+    # def test_pipe_cmds(self):
+    #     # cmd_0 = ["ffmpeg", "-i", file_name_absolute]
+    #     # cmd_1 = ["grep", "Duration"]
+    #     # cmd_2 = ["awk", "{print $2}"]
+    #     # cmd_3 = ["tr", "-d", ","]
+    #     # cmd_4 = ["awk", "-F", ":", "{print ($3+$2*60+$1*3600)/2}"]
+    #     pass

@@ -1,7 +1,6 @@
 import sys
-from parser import Parser
-from uploader import Uploader
-from utils import get_file_name_no_ext, get_file_name_no_ext_clean
+from .parser import Parser
+from .uploader import Uploader
 
 
 def main():
@@ -11,6 +10,5 @@ def main():
     uploader = Uploader(parser.args)
     uploader.upload_all_files()
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

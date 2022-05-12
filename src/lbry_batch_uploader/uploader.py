@@ -1,9 +1,9 @@
 import os
+import time
 import requests
 from argparse import Namespace
-
-from utils import get_file_name_no_ext, get_file_name_no_ext_clean
-from utils import ConnectionError
+from .utils import get_file_name_no_ext, get_file_name_no_ext_clean
+from .utils import ConnectionError
 
 
 class Uploader:
@@ -35,35 +35,38 @@ class Uploader:
             "channel_name": args.channel_name,
             "optimize_file": args.optimize_file and self._has_ffmpeg(),
             "bid": args.bid,
+            "fee_currency": "lbc",
+            "fee_amount": args.fee_amount,
             "tags": args.tags,
             "languages": args.languages,
             "license": args.license,
+            "funding_account_ids": [],
             "preview": False,
             "blocking": False,
         }
-        if args.fee_amount:
-            self.base_params["fee_currency"] = "LBC"
-            self.base_params["fee_amount"] = args.fee_amount
-
         if self.base_params["license"] == "Other":
             self.base_params["license_url"] = args.license_url
 
     def upload_all_files(self) -> None:
         """Upload all valid files to lbrynet."""
-        for name_no_ext, params in self.files_valid.items():
+        for idx, (name_no_ext, params) in enumerate(self.files_valid.items()):
             file_params = self.base_params.copy()
             file_params["title"] = name_no_ext
             file_params["name"] = get_file_name_no_ext_clean(name_no_ext)
 
-            full_path = os.path.join(self.base_path, params["file_name"])
-            file_params["file_path"] = full_path
+            if file_params["optimize_file"]:
+                file_ext = params["file_name"].split(".")[-1]
+                file_name = f"{name_no_ext}_fixed.{file_ext}"
+            else:
+                file_name = params["file_name"]
+            file_params["file_path"] = os.path.join(self.base_path, file_name)
 
             if params["desc_name"] is not None:
                 full_path = os.path.join(
                     self.base_path,
                     params["desc_name"]
                 )
-                with open(full_path, 'r') as f:
+                with open(full_path, "r") as f:
                     file_params["description"] = f.read()
 
             if params["thumbnail_name"] is not None:
@@ -77,9 +80,15 @@ class Uploader:
                 )
 
             claim_id = self._upload_file(file_params)
-            upload_msg = f"Sucessfully uploaded {params['file_name']}.\n" + \
-                            f"The claim id is {claim_id}."
+            claim_url = f"lbry://{file_params['name']}#{claim_id}"
+            upload_msg = f"Sucessfully uploaded {params['file_name']}\n" + \
+                            f"The claim id is {claim_id}\n" + \
+                            f"The claim url is {claim_url}"
             print(upload_msg, end="\n\n")
+
+            if idx != len(self.files_valid) - 1:
+                print("Wait 10 seconds to space out uploads...", end="\n\n")
+                time.sleep(10)
 
     def _get_valid_descriptions(self, files_name_all) -> None:
         """Get all valid descriptions for the corresponding files, if any."""
@@ -114,7 +123,7 @@ class Uploader:
     def _has_ffmpeg(self) -> bool:
         """Helper function for verifying proper configuration of ffmpeg."""
         json = {"method": "ffmpeg_find"}
-        req_result = self._post_req(json=json)['result']
+        req_result = self._post_req(json=json)["result"]
         if not req_result["available"]:
             msg = "ffmpeg is not configured properly." + \
                     "--optimize-file set to False."
@@ -133,12 +142,11 @@ class Uploader:
                     "with a properly configured port (default to 5279)."
             raise ConnectionError(msg) from None
 
-    def _upload_file(self, file_params: dict) -> str:
+    def _upload_file(self, file_params: dict) -> [str, str]:
         """Upload a single file to LBRY, return claim id."""
         json = {"method": "publish", "params": file_params}
-        req_result = self._post_req(json=json)['result']
-        req_result_outputs = req_result['outputs'][0]
-        print(f"permanent_url: {req_result_outputs['permanent_url']}")
+        req_result = self._post_req(json=json)["result"]
+        req_result_outputs = req_result["outputs"][0]
         return req_result_outputs["claim_id"]
 
     def _upload_thumbnail(self, t_name: str, t_path: str) -> str:
@@ -153,5 +161,5 @@ class Uploader:
         return req_data["serveUrl"]
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pass

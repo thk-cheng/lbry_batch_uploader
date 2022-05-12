@@ -230,12 +230,13 @@ RFC5646_LANGUAGE_TAGS = {
     "xh-ZA": "Xhosa (South Africa)",
     "zh": "Chinese",
     "zh-CN": "Chinese (Simplified)",
+    "zh-Hant": "Chinese (Traditional)",
     "zh-HK": "Chinese (Hong Kong)",
     "zh-MO": "Chinese (Macau)",
     "zh-SG": "Chinese (Singapore)",
     "zh-TW": "Chinese (Taiwan)",
     "zu": "Zulu",
-    "zu-ZA": "Zulu (South Africa)"
+    "zu-ZA": "Zulu (South Africa)",
 }
 
 LICENSES = [
@@ -412,43 +413,42 @@ def get_file_name_no_ext_clean(file_name_no_ext: str) -> str:
 #     return thumbnail_name
  
 
-# def _pipe_cmds(cmds: list[list[str]], *, prev_p: CompletedProcess = None) -> CompletedProcess:
-#     """
-#     Piping commands using the subprocess module.
+def _pipe_cmds(cmds: list[list[str]], *, prev_p: CompletedProcess = None) -> CompletedProcess:
+    """
+    Piping commands using the subprocess module.
 
-#     Parameters
-#     ----------
-#     cmds: list[str]
-#         A list that stores all the commands
+    Parameters
+    ----------
+    cmds: list[str]
+        A list that stores all the commands
 
-#     prev_p: subprocess.CompletedProcess (Optional)
-#         An instance of CompletedProcess for the previous command
+    prev_p: subprocess.CompletedProcess (Optional)
+        An instance of CompletedProcess for the previous command
 
-#     Returns
-#     -------
-#     p: subprocess.CompletedProcess
-#         An instance of CompletedProcess for the final result
+    Returns
+    -------
+    p: subprocess.CompletedProcess
+        An instance of CompletedProcess for the final result
 
-#     """
+    """
 
-#     if not isinstance(cmds, list):
-#         raise TypeError("cmds must be a list")
+    if not isinstance(cmds, list):
+        raise TypeError("cmds must be a list")
 
-#     if not isinstance(cmds[0], list) or len(cmds)<2:
-#         raise PipeError("At least two commands are needed for piping")
+    if not isinstance(cmds[0], list) or len(cmds)<2:
+        raise PipeError("At least two commands are needed for piping")
 
-#     if prev_p is not None:
-#         p = prev_p
-#     else:
-#         p = subprocess.run(cmd[0], capture_output=True, text=True)
-#         cmds = cmds[1:]
+    if prev_p is not None:
+        p = prev_p
+    else:
+        p = subprocess.run(cmd[0], capture_output=True, text=True)
+        cmds = cmds[1:]
 
-#     for cmd in cmds:
-#         p = subprocess.run(cmd, capture_output=True, text=True, input=p.stdout)
+    for cmd in cmds:
+        p = subprocess.run(cmd, capture_output=True, text=True, input=p.stdout)
 
-#     return p
+    return p
 
 
 if __name__ == "__main__":
     pass
-

@@ -3,19 +3,13 @@ from lbry_batch_uploader.parser import Parser
 from typing import Optional, Sequence
 
 
-@pytest.fixture
-def parser() -> Parser:
-    """pytest fixture for creating a Parser instance."""
-    return Parser()
-
-
 def assert_namespace(p: Parser,
                      file_directory: str,
                      channel_name: str,
                      optimize_file: bool,
                      port: int,
-                     bid: float,
-                     fee_amount: float,
+                     bid: str,
+                     fee_amount: str,
                      tags: list,
                      languages: list,
                      license: Optional[str],
@@ -23,12 +17,7 @@ def assert_namespace(p: Parser,
     """Helper function for asserting namespace."""
     assert p.args.file_directory == file_directory
     assert p.args.channel_name == channel_name
-
-    if optimize_file:
-        assert p.args.optimize_file
-    else:
-        assert not p.args.optimize_file
-
+    assert p.args.optimize_file is optimize_file
     assert p.args.port == port
     assert p.args.bid == bid
     assert p.args.fee_amount == fee_amount
@@ -44,6 +33,20 @@ def assert_namespace(p: Parser,
         assert p.args.license_url is license_url
     else:
         assert p.args.license_url == license_url
+
+
+def check_no_args(p: Parser, err_msg_args=None) -> None:
+    """Helper function for checking the 'args' attribute is not present."""
+    if err_msg_args is None:
+        err_msg_args = "'Parser' object has no attribute 'args'"
+    with pytest.raises(AttributeError,match=err_msg_args):
+        args = p.args
+
+
+@pytest.fixture
+def parser() -> Parser:
+    """Fixture for creating a Parser instance."""
+    return Parser()
 
 
 class TestPositionalArgs:
@@ -64,7 +67,7 @@ class TestPositionalArgs:
         assert_namespace(
             parser,
             "path/to/dir", "test_ch",
-            False, 5279, 0.0001, 0.,
+            False, 5279, "0.0001", "0",
             [], ["en"], None, None
         )
 
@@ -92,10 +95,7 @@ class TestPositionalArgs:
                     f": the following arguments are required: {missing_args}"
         assert captured.out == ""
         assert err_msg in captured.err
-
-        err_msg_args = "'Parser' object has no attribute 'args'"
-        with pytest.raises(AttributeError,match=err_msg_args):
-            args = parser.args
+        check_no_args(parser)
 
     @pytest.mark.parametrize("args",[("path/to/dir", "test_ch", "0.1")])
     def test_pos_args_extra(self,
@@ -111,10 +111,7 @@ class TestPositionalArgs:
                     f": unrecognized arguments: {args[-1]}"
         assert captured.out == ""
         assert err_msg in captured.err
-
-        err_msg_args = "'Parser' object has no attribute 'args'"
-        with pytest.raises(AttributeError,match=err_msg_args):
-            args = parser.args
+        check_no_args(parser)
 
 
 class TestOptionalArgs:
@@ -149,7 +146,7 @@ class TestOptionalArgs:
         assert_namespace(
             parser,
             "path/to/dir", "test_ch",
-            True, 5000, 0.5, 0.1,
+            True, 5000, "0.5", "0.1",
             ["tag0", "tag1"], ["en", "zh"],
             "Other", "https://www.123.xyz"
         )
@@ -171,10 +168,7 @@ class TestOptionalArgs:
                     f": unrecognized arguments: {args[-1]}"
         assert captured.out == ""
         assert err_msg in captured.err
-
-        err_msg_args = "'Parser' object has no attribute 'args'"
-        with pytest.raises(AttributeError,match=err_msg_args):
-            args = parser.args
+        check_no_args(parser)
 
     @pytest.mark.parametrize(
         "args",
@@ -197,10 +191,7 @@ class TestOptionalArgs:
                     ": expected one argument"
         assert captured.out == ""
         assert err_msg in captured.err
-
-        err_msg_args = "'Parser' object has no attribute 'args'"
-        with pytest.raises(AttributeError,match=err_msg_args):
-            args = parser.args
+        check_no_args(parser)
 
     @pytest.mark.parametrize(
         "args",
@@ -223,10 +214,7 @@ class TestOptionalArgs:
                     f": unrecognized arguments: {args[-1]}"
         assert captured.out == ""
         assert err_msg in captured.err
-
-        err_msg_args = "'Parser' object has no attribute 'args'"
-        with pytest.raises(AttributeError,match=err_msg_args):
-            args = parser.args
+        check_no_args(parser)
 
     @pytest.mark.parametrize("args",[("path/to/dir", "test_ch", "--tags")])
     def test_tags_misspec(self,
@@ -242,10 +230,7 @@ class TestOptionalArgs:
                     ": expected at least one argument"
         assert captured.out == ""
         assert err_msg in captured.err
-
-        err_msg_args = "'Parser' object has no attribute 'args'"
-        with pytest.raises(AttributeError,match=err_msg_args):
-            args = parser.args
+        check_no_args(parser)
 
     @pytest.mark.parametrize(
         "args",
@@ -271,10 +256,7 @@ class TestOptionalArgs:
             err_msg += f": invalid choice: '{args[-1]}'"
         assert captured.out == ""
         assert err_msg in captured.err
-
-        err_msg_args = "'Parser' object has no attribute 'args'"
-        with pytest.raises(AttributeError,match=err_msg_args):
-            args = parser.args
+        check_no_args(parser)
 
     @pytest.mark.parametrize(
         "args",
@@ -299,10 +281,7 @@ class TestOptionalArgs:
             err_msg += f": invalid choice: '{args[-1]}'"
         assert captured.out == ""
         assert err_msg in captured.err
-
-        err_msg_args = "'Parser' object has no attribute 'args'"
-        with pytest.raises(AttributeError,match=err_msg_args):
-            args = parser.args
+        check_no_args(parser)
 
     @pytest.mark.parametrize(
         "args",
@@ -329,10 +308,7 @@ class TestOptionalArgs:
                     "if and only if --license='Other'"
         assert captured.out == ""
         assert err_msg in captured.err
-
-        err_msg_args = "'Parser' object has no attribute 'args'"
-        with pytest.raises(AttributeError,match=err_msg_args):
-            args = parser.args
+        check_no_args(parser)
 
     @pytest.mark.parametrize(
         "args",
@@ -359,10 +335,7 @@ class TestOptionalArgs:
                     ": expected one argument"
         assert captured.out == ""
         assert err_msg in captured.err
-
-        err_msg_args = "'Parser' object has no attribute 'args'"
-        with pytest.raises(AttributeError,match=err_msg_args):
-            args = parser.args
+        check_no_args(parser)
 
 class TestHelpOption:
     """Tests related to the help option."""
@@ -380,7 +353,4 @@ class TestHelpOption:
         help_string_head = f"usage: {parser.argparser.prog} [-h]"
         assert help_string_head in captured.out
         assert captured.err == ""
-
-        err_msg_args = "'Parser' object has no attribute 'args'"
-        with pytest.raises(AttributeError,match=err_msg_args):
-            args = parser.args
+        check_no_args(parser)
