@@ -1,7 +1,7 @@
 # LBRY Batch Uploader
 
 ![Tests](https://github.com/thk-cheng/lbry_batch_uploader/actions/workflows/tests.yml/badge.svg)
-[![codecov](https://codecov.io/gh/thk-cheng/lbry_batch_uploader/branch/main/graph/badge.svg?token=WDEPGDW24K)](https://codecov.io/gh/thk-cheng/lbry_batch_uploader)
+[![codecov](https://codecov.io/gh/thk-cheng/lbry_batch_uploader/branch/main/graph/badge.svg?token=3HQRYZ8Q05)](https://codecov.io/gh/thk-cheng/lbry_batch_uploader)
 
 A convenient and minimalistic batch uploader for [LBRY Desktop](https://lbry.com/get) written in Python.\
 For a detail specification of the LBRY protocol, please visit https://lbry.tech/
