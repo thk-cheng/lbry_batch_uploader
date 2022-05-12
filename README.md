@@ -1,5 +1,7 @@
 # LBRY Batch Uploader
 
+![Tests](https://github.com/thk-cheng/lbry_batch_uploader/actions/workflows/tests.yml/badge.svg)
+
 A convenient and minimalistic batch uploader for [LBRY Desktop](https://lbry.com/get) written in Python.\
 For a detail specification of the LBRY protocol, please visit https://lbry.tech/
 
