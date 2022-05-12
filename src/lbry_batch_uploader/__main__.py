@@ -10,5 +10,6 @@ def main():
     uploader = Uploader(parser.args)
     uploader.upload_all_files()
 
+
 if __name__ == "__main__":
     main()
