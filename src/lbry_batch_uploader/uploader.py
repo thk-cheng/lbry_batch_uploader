@@ -2,6 +2,7 @@ import os
 import time
 import requests
 from argparse import Namespace
+from typing import Dict, List
 from .utils import (
     get_file_name_no_ext,
     get_file_name_no_ext_clean,
@@ -23,7 +24,7 @@ class Uploader:
             get_file_name_no_ext(name) for name in files_name_valid
         ]
 
-        self.files_valid: dict[str, dict[str, str]] = {}
+        self.files_valid: Dict[str, Dict[str, str]] = {}
         for fn, fn_no_ext in zip(files_name_valid, files_name_valid_no_ext):
             self.files_valid[fn_no_ext] = {
                 "file_name": fn,
@@ -100,7 +101,7 @@ class Uploader:
                 print("Wait 10 seconds to space out uploads...", end="\n\n")
                 time.sleep(10)
 
-    def _get_valid_files(self, files_name_all) -> list[str]:
+    def _get_valid_files(self, files_name_all) -> List[str]:
         """Get all valid files for upload in the specified directory."""
         target_ext = ("mp4", "mkv", "webm", "mp3", "opus")
         files_name_valid = []
