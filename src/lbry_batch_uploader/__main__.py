@@ -1,6 +1,6 @@
 import sys
-from .parser import Parser
-from .uploader import Uploader
+from lbry_batch_uploader.parser import Parser
+from lbry_batch_uploader.uploader import Uploader
 
 
 def main():
