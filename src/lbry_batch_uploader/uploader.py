@@ -3,7 +3,7 @@ import time
 import requests
 from argparse import Namespace
 from typing import Dict, List
-from .utils import (
+from lbry_batch_uploader.utils import (
     get_file_name_no_ext,
     get_file_name_no_ext_clean,
     ConnectionError

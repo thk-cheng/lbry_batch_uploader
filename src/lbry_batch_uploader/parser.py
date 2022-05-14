@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 from typing import Sequence
-from .utils import RFC5646_LANGUAGE_TAGS, LICENSES
+from lbry_batch_uploader.utils import RFC5646_LANGUAGE_TAGS, LICENSES
 
 
 class Parser:
