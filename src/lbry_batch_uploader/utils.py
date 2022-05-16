@@ -252,11 +252,6 @@ class Error(Exception):
     pass
 
 
-class ConnectionError(Exception):
-    """Exception raised for error in connecting with lbrynet."""
-    pass
-
-
 class PipeError(Error):
     """Exception raised for error in piping commands."""
     pass
