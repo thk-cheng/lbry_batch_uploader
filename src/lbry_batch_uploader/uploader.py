@@ -1,12 +1,12 @@
 import os
 import time
 import requests
+from requests import RequestException
 from argparse import Namespace
 from typing import Dict, List
 from lbry_batch_uploader.utils import (
     get_file_name_no_ext,
-    get_file_name_no_ext_clean,
-    ConnectionError
+    get_file_name_no_ext_clean
 )
 
 
@@ -15,9 +15,25 @@ class Uploader:
 
     def __init__(self, args: Namespace) -> None:
         """Initialize the class with parsed arguments."""
-        self.base_path = args.file_directory
-        self.port_url = f"http://localhost:{args.port}/"
+        self._set_base_path(args.file_directory)
+        self._set_port_url(args.port)
+        self.base_params = {
+            "channel_name": args.channel_name,
+            "optimize_file": args.optimize_file and self._has_ffmpeg(),
+            "bid": args.bid,
+            "fee_currency": "lbc",
+            "fee_amount": args.fee_amount,
+            "tags": args.tags,
+            "languages": args.languages,
+            "license": args.license,
+            "preview": False,
+            "blocking": False,
+        }
+        if self.base_params["license"] == "Other":
+            self.base_params["license_url"] = args.license_url
 
+    def get_all_files(self) -> None:
+        """Get all valid files, and their descriptions and thumbnails."""
         files_name_all = os.listdir(self.base_path)
         files_name_valid = self._get_valid_files(files_name_all)
         files_name_valid_no_ext = [
@@ -37,26 +53,12 @@ class Uploader:
             "descriptions",
             ("txt", "description")
         )
+
         self._get_valid_ftypes(
             files_name_all,
             "thumbnails",
             ("gif", "jpg", "png")
         )
-
-        self.base_params = {
-            "channel_name": args.channel_name,
-            "optimize_file": args.optimize_file and self._has_ffmpeg(),
-            "bid": args.bid,
-            "fee_currency": "lbc",
-            "fee_amount": args.fee_amount,
-            "tags": args.tags,
-            "languages": args.languages,
-            "license": args.license,
-            "preview": False,
-            "blocking": False,
-        }
-        if self.base_params["license"] == "Other":
-            self.base_params["license_url"] = args.license_url
 
     def upload_all_files(self) -> None:
         """Upload all valid files to lbrynet."""
@@ -101,6 +103,23 @@ class Uploader:
                 print("Wait 10 seconds to space out uploads...", end="\n\n")
                 time.sleep(10)
 
+    def _get_req_info(self, req_json: dict, info_type: str) -> dict:
+        """Get 'result' from json, except error occured in the post request."""
+        if (info_type != "data") and (info_type != "result"):
+            err_msg = "'info_type' should be either 'data' or 'result'."
+            raise ValueError(err_msg)
+
+        try:
+            req_info: dict = req_json[info_type]
+        except KeyError as e:
+            req_err = req_json["error"]
+            if req_err["data"]["name"] == "ValueError":
+                raise ValueError(req_err["message"]) from None
+            else:
+                raise e from None
+
+        return req_info
+
     def _get_valid_files(self, files_name_all) -> List[str]:
         """Get all valid files for upload in the specified directory."""
         target_ext = ("mp4", "mkv", "webm", "mp3", "opus")
@@ -129,8 +148,9 @@ class Uploader:
 
     def _has_ffmpeg(self) -> bool:
         """Helper function for verifying proper configuration of ffmpeg."""
-        json = {"method": "ffmpeg_find"}
-        req_result: dict = self._post_req(json=json)["result"]
+        json_ffmpeg = {"method": "ffmpeg_find"}
+        req_json: dict = post_req(self.port_url, json=json_ffmpeg)
+        req_result: dict = self._get_req_info(req_json, "result")
         req_result_avail: bool = req_result["available"]
 
         if not req_result_avail:
@@ -140,23 +160,30 @@ class Uploader:
 
         return req_result_avail
 
-    def _post_req(self, port: str = "", **kwargs) -> dict:
-        """Helper function for submitting post request."""
-        if not port:
-            port = self.port_url
+    def _set_base_path(self, path: str) -> None:
+        """Set 'base_path', check existence and convert to absolute."""
+        path_abs = os.path.abspath(path)
+        if os.path.exists(path_abs):
+            self.base_path = path_abs
+        else:
+            err_msg = f"The directory {path_abs} does not exist."
+            raise FileNotFoundError(err_msg)
 
-        try:
-            req_json: dict = requests.post(port, **kwargs).json()
-            return req_json
-        except ConnectionRefusedError:
-            msg = "Please check that LBRY Desktop is up and running " + \
-                    "with a properly configured port (default to 5279)."
-            raise ConnectionError(msg) from None
+    def _set_port_url(self, port: int) -> None:
+        """Set 'path_url', check value and availability."""
+        if (port < 0) or (port > 65353):
+            err_msg = f"The port {port} is not between 0 and 65353."
+            raise TypeError(err_msg)
+
+        port_url = f"http://localhost:{port}"
+        _ = post_req(port_url, json={"method": "version"})
+        self.port_url = port_url
 
     def _upload_file(self, file_params: dict) -> str:
         """Upload a single file to LBRY, return claim id."""
-        json = {"method": "publish", "params": file_params}
-        req_result = self._post_req(json=json)["result"]
+        json_uploadfile = {"method": "publish", "params": file_params}
+        req_json: dict = post_req(self.port_url, json=json_uploadfile)
+        req_result: dict = self._get_req_info(req_json, "result")
         claim_id: str = req_result["outputs"][0]["claim_id"]
         return claim_id
 
@@ -164,14 +191,21 @@ class Uploader:
         """Upload a single thumbnail to spee.ch, return thumbnail url."""
         with open(t_path, "rb") as f:
             thumbnail = f.read()
-        req_json = self._post_req(
-            port="https://spee.ch/api/claim/publish",
+
+        req_json: dict = post_req(
+            "https://spee.ch/api/claim/publish",
             files={"file": thumbnail},
             data={"name": t_name}
         )
-        thumbnail_url: str = req_json["data"]["serveUrl"]
+        req_data: dict = self._get_req_info(req_json, "data")
+        thumbnail_url: str = req_data["serveUrl"]
         return thumbnail_url
 
 
-if __name__ == "__main__":
-    pass
+def post_req(port_url: str, **kwargs) -> dict:
+    """Helper function for submitting post request."""
+    try:
+        req_json: dict = requests.post(port_url, **kwargs).json()
+        return req_json
+    except RequestException as e:
+        raise e from None
