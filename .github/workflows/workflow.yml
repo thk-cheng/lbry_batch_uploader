@@ -1,4 +1,4 @@
-name: Testing and Coverage
+name: Tests
 
 on:
   - push
@@ -24,4 +24,5 @@ jobs:
         pip install tox tox-gh-actions
     - name: Test with tox
       run: tox
+    - name: Code coverage
     - uses: codecov/codecov-action@v2
