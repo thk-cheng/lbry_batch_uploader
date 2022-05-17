@@ -175,8 +175,10 @@ class Uploader:
             err_msg = f"The port {port} is not between 0 and 65353."
             raise TypeError(err_msg)
 
+        # Check that the provided port is accessible
         port_url = f"http://localhost:{port}"
         _ = post_req(port_url, json={"method": "version"})
+
         self.port_url = port_url
 
     def _upload_file(self, file_params: dict) -> str:
@@ -203,7 +205,7 @@ class Uploader:
 
 
 def post_req(port_url: str, **kwargs) -> dict:
-    """Helper function for submitting post request."""
+    """Helper function for submitting post request, return json response."""
     try:
         req_json: dict = requests.post(port_url, **kwargs).json()
         return req_json
