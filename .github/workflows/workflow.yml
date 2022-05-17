@@ -28,5 +28,5 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: codecov/codecov-action@v2
-    with:
-      token: ${{ secrets.CODECOV_TOKEN }}
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
