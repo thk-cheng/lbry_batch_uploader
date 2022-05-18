@@ -11,7 +11,7 @@ import pathlib
 
 
 class MockResponse:
-    """Dummy mock response class."""
+    """Dummy mock request.Resopnse class."""
 
     pass
 
@@ -109,7 +109,7 @@ def mock_response_noffmpeg(monkeypatch: Type[pytest.MonkeyPatch]) -> None:
 
 
 @pytest.fixture
-def mock_sleep(monkeypatch: Type[pytest.MonkeyPatch]) -> None:
+def mock_time(monkeypatch: Type[pytest.MonkeyPatch]) -> None:
     """Mock time.sleep so that it doesn't actually sleep."""
 
     def no_sleep(*args, **kwargs):
@@ -462,7 +462,7 @@ class TestUploadAllFiles:
         self,
         uploader_normal: Type[Uploader],
         mock_response_good: None,
-        mock_sleep: None,
+        mock_time: None,
         capsys: Type[pytest.CaptureFixture],
     ) -> None:
         """Test that the upload_all_files method returns the correct output(s)."""
@@ -483,7 +483,7 @@ class TestUploadAllFiles:
         self,
         uploader_normal_no_optimize: Type[Uploader],
         mock_response_good: None,
-        mock_sleep: None,
+        mock_time: None,
         capsys: Type[pytest.CaptureFixture],
     ) -> None:
         """Same as above, but with the --optimize-file flag not specified."""
