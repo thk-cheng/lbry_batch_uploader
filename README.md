@@ -1,10 +1,9 @@
 # LBRY Batch Uploader
 
 ![License](https://img.shields.io/github/license/thk-cheng/lbry_batch_uploader)
-<!---
 ![Tests](https://github.com/thk-cheng/lbry_batch_uploader/actions/workflows/workflow.yml/badge.svg)
-![Coverage](https://img.shields.io/codecov/c/gh/thk-cheng/lbry_batch_uploader?token=3HQRYZ8Q05)
--->
+![Coverage](https://img.shields.io/codecov/c/gh/thk-cheng/lbry_batch_uploader)
+
 
 A convenient and minimalistic batch uploader for [LBRY Desktop](https://lbry.com/get) written in Python.\
 For a detail specification of the LBRY protocol, please visit https://lbry.tech/
