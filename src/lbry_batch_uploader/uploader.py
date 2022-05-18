@@ -4,10 +4,7 @@ import requests
 from requests import RequestException
 from argparse import Namespace
 from typing import Dict, List
-from lbry_batch_uploader.utils import (
-    get_file_name_no_ext,
-    get_file_name_no_ext_clean
-)
+from lbry_batch_uploader.utils import get_file_name_no_ext, get_file_name_no_ext_clean
 
 
 class Uploader:
@@ -48,17 +45,9 @@ class Uploader:
                 "thumbnail_name": "",
             }
 
-        self._get_valid_ftypes(
-            files_name_all,
-            "descriptions",
-            ("txt", "description")
-        )
+        self._get_valid_ftypes(files_name_all, "descriptions", ("txt", "description"))
 
-        self._get_valid_ftypes(
-            files_name_all,
-            "thumbnails",
-            ("gif", "jpg", "png")
-        )
+        self._get_valid_ftypes(files_name_all, "thumbnails", ("gif", "jpg", "png"))
 
     def upload_all_files(self) -> None:
         """Upload all valid files to lbrynet."""
@@ -75,28 +64,23 @@ class Uploader:
             file_params["file_path"] = os.path.join(self.base_path, file_name)
 
             if params["desc_name"]:
-                full_path = os.path.join(
-                    self.base_path,
-                    params["desc_name"]
-                )
+                full_path = os.path.join(self.base_path, params["desc_name"])
                 with open(full_path, "r") as f:
                     file_params["description"] = f.read()
 
             if params["thumbnail_name"]:
-                full_path = os.path.join(
-                    self.base_path,
-                    params["thumbnail_name"]
-                )
+                full_path = os.path.join(self.base_path, params["thumbnail_name"])
                 file_params["thumbnail_url"] = self._upload_thumbnail(
-                    file_params["name"],
-                    full_path
+                    file_params["name"], full_path
                 )
 
             claim_id = self._upload_file(file_params)
             claim_url = f"lbry://{file_params['name']}#{claim_id}"
-            upload_msg = f"Sucessfully uploaded {params['file_name']}\n" + \
-                         f"The claim id is {claim_id}\n" + \
-                         f"The claim url is {claim_url}"
+            upload_msg = (
+                f"Sucessfully uploaded {params['file_name']}\n"
+                + f"The claim id is {claim_id}\n"
+                + f"The claim url is {claim_url}"
+            )
             print(upload_msg, end="\n\n")
 
             if idx != len(self.files_valid) - 1:
@@ -154,8 +138,7 @@ class Uploader:
         req_result_avail: bool = req_result["available"]
 
         if not req_result_avail:
-            msg = "ffmpeg is not configured properly." + \
-                    "--optimize-file set to False."
+            msg = "ffmpeg is not configured properly." + "--optimize-file set to False."
             print(msg)
 
         return req_result_avail
@@ -197,7 +180,7 @@ class Uploader:
         req_json: dict = post_req(
             "https://spee.ch/api/claim/publish",
             files={"file": thumbnail},
-            data={"name": t_name}
+            data={"name": t_name},
         )
         req_data: dict = self._get_req_info(req_json, "data")
         thumbnail_url: str = req_data["serveUrl"]

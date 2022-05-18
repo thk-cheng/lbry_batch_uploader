@@ -36,6 +36,7 @@ class MockResponseFfmpegMissing:
 @pytest.fixture
 def mock_response_good(monkeypatch: Type[pytest.MonkeyPatch]) -> None:
     """Mock Requests.post() to return MockResponse instead."""
+
     def mock_post(*args, **kwargs):
         method = kwargs["json"]["method"]
         if method == "version":
@@ -50,6 +51,7 @@ def mock_response_good(monkeypatch: Type[pytest.MonkeyPatch]) -> None:
 @pytest.fixture
 def mock_response_badport(monkeypatch: Type[pytest.MonkeyPatch]) -> None:
     """Mock Requests.post() to raise requests.ConnectionError instead."""
+
     def mock_post(*args, **kwargs):
         method = kwargs["json"]["method"]
         if method == "version":
@@ -66,6 +68,7 @@ def mock_response_badport(monkeypatch: Type[pytest.MonkeyPatch]) -> None:
 @pytest.fixture
 def mock_response_noffmpeg(monkeypatch: Type[pytest.MonkeyPatch]) -> None:
     """Mock Requests.post() to return MockResponseFfmpegMissing instead."""
+
     def mock_post(*args, **kwargs):
         method = kwargs["json"]["method"]
         if method == "version":
@@ -112,19 +115,30 @@ def parser() -> Type[Parser]:
 
 
 @pytest.fixture
-def args_normal(parser: Type[Parser],
-                fake_dir: Type[pathlib.Path]) -> Type[argparse.Namespace]:
+def args_normal(
+    parser: Type[Parser], fake_dir: Type[pathlib.Path]
+) -> Type[argparse.Namespace]:
     """Return a well-behaved argparse.Namespace object."""
     args = [
         str(fake_dir),
         "@batch-upload-testing",
         "--optimize-file",
-        "--bid", "0.56",
-        "--fee-amount", "1.23",
-        "--tags", "tag0", "tag1", "tag2", "tag3", "tag4",
-        "--languages", "en",
-        "--license", "Other",
-        "--license-url", "https://www.123.xyz"
+        "--bid",
+        "0.56",
+        "--fee-amount",
+        "1.23",
+        "--tags",
+        "tag0",
+        "tag1",
+        "tag2",
+        "tag3",
+        "tag4",
+        "--languages",
+        "en",
+        "--license",
+        "Other",
+        "--license-url",
+        "https://www.123.xyz",
     ]
     parser.parse(args)
     return parser.args
@@ -142,34 +156,39 @@ def args_wrong_path(parser: Type[Parser]) -> Type[argparse.Namespace]:
 
 
 @pytest.fixture
-def args_wrong_port0(parser: Type[Parser],
-                     fake_dir: Type[pathlib.Path]) -> Type[argparse.Namespace]:
+def args_wrong_port0(
+    parser: Type[Parser], fake_dir: Type[pathlib.Path]
+) -> Type[argparse.Namespace]:
     """Return a argparse.Namespace object, with out of range port number."""
     args = [
         str(fake_dir),
         "@batch-upload-testing",
-        "--port",  "70000",
+        "--port",
+        "70000",
     ]
     parser.parse(args)
     return parser.args
 
 
 @pytest.fixture
-def args_wrong_port1(parser: Type[Parser],
-                     fake_dir: Type[pathlib.Path]) -> Type[argparse.Namespace]:
+def args_wrong_port1(
+    parser: Type[Parser], fake_dir: Type[pathlib.Path]
+) -> Type[argparse.Namespace]:
     """Return a argparse.Namespace object, with ill-configured port."""
     args = [
         str(fake_dir),
         "@batch-upload-testing",
-        "--port",  "9999",
+        "--port",
+        "9999",
     ]
     parser.parse(args)
     return parser.args
 
 
 @pytest.fixture
-def args_no_ffmpeg(parser: Type[Parser],
-                   fake_dir: Type[pathlib.Path]) -> Type[argparse.Namespace]:
+def args_no_ffmpeg(
+    parser: Type[Parser], fake_dir: Type[pathlib.Path]
+) -> Type[argparse.Namespace]:
     """Return a argparse.Namespace object, with ill-configured ffmpeg."""
     args = [
         str(fake_dir),
@@ -181,8 +200,9 @@ def args_no_ffmpeg(parser: Type[Parser],
 
 
 @pytest.fixture
-def uploader_normal(args_normal: Type[argparse.Namespace],
-                    mock_response_good: None) -> Type[Uploader]:
+def uploader_normal(
+    args_normal: Type[argparse.Namespace], mock_response_good: None
+) -> Type[Uploader]:
     """Return a well-behaved Uploader instance."""
     return Uploader(args_normal)
 
@@ -190,41 +210,40 @@ def uploader_normal(args_normal: Type[argparse.Namespace],
 class TestInit:
     """Testing the __init__ method and related helper methods."""
 
-    def test_wrong_path(self,
-                        args_wrong_path: Type[argparse.Namespace]) -> None:
+    def test_wrong_path(self, args_wrong_path: Type[argparse.Namespace]) -> None:
         """Test"""
         wrong_path = os.path.abspath(args_wrong_path.file_directory)
         err_msg = f"The directory {wrong_path} does not exist."
         with pytest.raises(FileNotFoundError, match=err_msg):
             _ = Uploader(args_wrong_path)
 
-    def test_wrong_port0(self,
-                         args_wrong_port0: Type[argparse.Namespace]) -> None:
+    def test_wrong_port0(self, args_wrong_port0: Type[argparse.Namespace]) -> None:
         """Test"""
         wrong_port = args_wrong_port0.port
         err_msg = f"The port {wrong_port} is not between 0 and 65353."
         with pytest.raises(TypeError, match=err_msg):
             _ = Uploader(args_wrong_port0)
 
-    def test_wrong_port1(self,
-                         args_wrong_port1: Type[argparse.Namespace],
-                         mock_response_badport: None) -> None:
+    def test_wrong_port1(
+        self, args_wrong_port1: Type[argparse.Namespace], mock_response_badport: None
+    ) -> None:
         """Test"""
         wrong_port = args_wrong_port1.port
         with pytest.raises(RequestException, match=f"port={wrong_port}"):
             _ = Uploader(args_wrong_port1)
 
-    def test_no_ffmpeg(self,
-                       args_no_ffmpeg: Type[argparse.Namespace],
-                       mock_response_noffmpeg: None,
-                       capsys: pytest.CaptureFixture) -> None:
+    def test_no_ffmpeg(
+        self,
+        args_no_ffmpeg: Type[argparse.Namespace],
+        mock_response_noffmpeg: None,
+        capsys: pytest.CaptureFixture,
+    ) -> None:
         """Test"""
         uploader_no_ffmpeg = Uploader(args_no_ffmpeg)
         assert not uploader_no_ffmpeg.base_params["optimize_file"]
 
         captured = capsys.readouterr()
-        msg = "ffmpeg is not configured properly." + \
-              "--optimize-file set to False."
+        msg = "ffmpeg is not configured properly." + "--optimize-file set to False."
         assert msg in captured.out
         assert captured.err == ""
 
@@ -252,12 +271,11 @@ class TestGetReqInfo:
         [
             ({"jsonrpc": "2.0", "result": {"abc": "123"}}, "result"),
             ({"jsonrpc": "2.0", "data": {"abc": "123"}}, "data"),
-        ]
+        ],
     )
-    def test_normal(self,
-                    uploader_normal: Type[Uploader],
-                    req_json: dict,
-                    info_type: str) -> None:
+    def test_normal(
+        self, uploader_normal: Type[Uploader], req_json: dict, info_type: str
+    ) -> None:
         """Test"""
         req_info = uploader_normal._get_req_info(req_json, info_type)
         assert req_info == {"abc": "123"}
@@ -267,12 +285,11 @@ class TestGetReqInfo:
         [
             ({"jsonrpc": "2.0", "result": {}}, "abc"),
             ({"jsonrpc": "2.0", "data": {}}, "xyz"),
-        ]
+        ],
     )
-    def test_wrong_info_type(self,
-                             uploader_normal: Type[Uploader],
-                             req_json: dict,
-                             info_type: str) -> None:
+    def test_wrong_info_type(
+        self, uploader_normal: Type[Uploader], req_json: dict, info_type: str
+    ) -> None:
         """Test"""
         err_msg = "'info_type' should be either 'data' or 'result'."
         with pytest.raises(ValueError, match=err_msg):
@@ -281,20 +298,29 @@ class TestGetReqInfo:
     @pytest.mark.parametrize(
         "req_json, info_type",
         [
-            ({"error": {
-                "data": {"name": "ValueError"},
-                "message": "This is a test error message.",
-            }}, "result"),
-            ({"error": {
-                "data": {"name": "ValueError"},
-                "message": "This is a test error message.",
-            }}, "data"),
-        ]
+            (
+                {
+                    "error": {
+                        "data": {"name": "ValueError"},
+                        "message": "This is a test error message.",
+                    }
+                },
+                "result",
+            ),
+            (
+                {
+                    "error": {
+                        "data": {"name": "ValueError"},
+                        "message": "This is a test error message.",
+                    }
+                },
+                "data",
+            ),
+        ],
     )
-    def test_valueerror(self,
-                        uploader_normal: Type[Uploader],
-                        req_json: dict,
-                        info_type: str) -> None:
+    def test_valueerror(
+        self, uploader_normal: Type[Uploader], req_json: dict, info_type: str
+    ) -> None:
         """Test"""
         err_msg = "This is a test error message."
         with pytest.raises(ValueError, match=err_msg):
@@ -303,18 +329,27 @@ class TestGetReqInfo:
     @pytest.mark.parametrize(
         "req_json, info_type",
         [
-            ({"error": {
-                "data": {"name": "OtherError"},
-            }}, "result"),
-            ({"error": {
-                "data": {"name": "OtherError"},
-            }}, "data"),
-        ]
+            (
+                {
+                    "error": {
+                        "data": {"name": "OtherError"},
+                    }
+                },
+                "result",
+            ),
+            (
+                {
+                    "error": {
+                        "data": {"name": "OtherError"},
+                    }
+                },
+                "data",
+            ),
+        ],
     )
-    def test_othererrors(self,
-                         uploader_normal: Type[Uploader],
-                         req_json: dict,
-                         info_type: str) -> None:
+    def test_othererrors(
+        self, uploader_normal: Type[Uploader], req_json: dict, info_type: str
+    ) -> None:
         """Test"""
         with pytest.raises(KeyError):
             uploader_normal._get_req_info(req_json, info_type)
