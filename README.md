@@ -16,13 +16,13 @@ Coming soon!
 
 # Developing
 
-This project uses ``black`` to format code and ``flake8`` for linting. We also support ``pre-commit`` to ensure
-these have been run. To configure your local environment please install these development dependencies and set up
-the commit hooks.
+This project uses ``black`` to format code and ``flake8`` for linting. ``pre-commit`` is also supported to ensure these have been run. \
+To properly configure your local environment, please install the development dependencies andset up the commit hooks accordingly.
 
-```bash
+```shell
 
 pip install -r requirements_dev.txt
+pip install -e .
 pre-commit install
 
 ```
@@ -36,7 +36,7 @@ This project is MIT licensed. For the full license, see [LICENSE](LICENSE).
 
 Install through pip
 
-```bash
+```shell
 
 pip install lbry_batch_uploader
 
