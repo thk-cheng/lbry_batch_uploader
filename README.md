@@ -10,20 +10,28 @@
 A convenient and minimalistic batch uploader for [LBRY Desktop](https://lbry.com/get) written in Python.\
 For a detail specification of the LBRY protocol, please visit https://lbry.tech/
 
-------
-
 # Work In Progress
 
 Coming soon!
 
-------
+# Developing
+
+This project uses ``black`` to format code and ``flake8`` for linting. We also support ``pre-commit`` to ensure
+these have been run. To configure your local environment please install these development dependencies and set up
+the commit hooks.
+
+```bash
+
+pip install -r requirements_dev.txt
+pre-commit install
+
+```
 
 ## License
 
 This project is MIT licensed. For the full license, see [LICENSE](LICENSE).
 
 <!---
-
 ## Installation
 
 Install through pip
@@ -77,9 +85,4 @@ lbry_batch_uploader -i [ID] -n [Name] -p [price_in_lbc] -b [bid_ammount] -t [tag
 -e, --exclude file_ext1, file_ext2,...       Indicate which types of file should be excluded from upload (e.g. jpg,txt,...)
 
 ```
-
-## On-going Development
-
-- To be added
-
 -->

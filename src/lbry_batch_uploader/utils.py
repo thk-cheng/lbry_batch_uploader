@@ -244,16 +244,18 @@ LICENSES = [
     "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International",
     "Copyrighted (All rights reserved)",
     "Other",
-    ]
+]
 
 
 class Error(Exception):
     """Base class for other exceptions."""
+
     pass
 
 
 class PipeError(Error):
     """Exception raised for error in piping commands."""
+
     pass
 
 
