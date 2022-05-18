@@ -1,11 +1,11 @@
 # LBRY Batch Uploader
 
 ![Tests](https://github.com/thk-cheng/lbry_batch_uploader/actions/workflows/workflow.yml/badge.svg)
-![Tests](https://github.com/thk-cheng/lbry_batch_uploader/actions/workflows/pre-commit.yaml/badge.svg)
+![PreCommit](https://github.com/thk-cheng/lbry_batch_uploader/actions/workflows/pre-commit.yaml/badge.svg)
 ![Coverage](https://img.shields.io/codecov/c/gh/thk-cheng/lbry_batch_uploader)
-![Issues](https://img.shields.io/github/issues/thk-cheng/lbry_batch_uploader)
-![Forks](https://img.shields.io/github/forks/thk-cheng/lbry_batch_uploader)
-![Stars](https://img.shields.io/github/stars/thk-cheng/lbry_batch_uploader)
+![PyVersions](https://img.shields.io/pypi/pyversions/lbry-batch-uploader)
+![Wheel](https://img.shields.io/pypi/wheel/lbry-batch-uploader)
+![PyPIVersion](https://img.shields.io/pypi/v/lbry-batch-uploader)
 ![License](https://img.shields.io/github/license/thk-cheng/lbry_batch_uploader)
 
 A convenient and minimalistic batch uploader for [LBRY Desktop](https://lbry.com/get) written in Python.\
