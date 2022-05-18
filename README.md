@@ -16,9 +16,8 @@ Coming soon!
 
 # Developing
 
-This project uses ``black`` to format code and ``flake8`` for linting. ``pre-commit`` is also supported to ensure
-these have been run. To configure your local environment please install the development dependencies and set up
-the commit hooks.
+This project uses ``black`` to format code and ``flake8`` for linting. ``pre-commit`` is also supported to ensure these have been run. \
+To properly configure your local environment, please install the development dependencies andset up the commit hooks accordingly.
 
 ```shell
 
