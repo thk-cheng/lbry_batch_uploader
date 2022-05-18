@@ -1,6 +1,6 @@
 import pytest
 from lbry_batch_uploader.parser import Parser
-from typing import Optional, Sequence
+from typing import Type, Optional, Sequence
 
 
 def assert_namespace(
@@ -37,7 +37,7 @@ def assert_namespace(
         assert p.args.license_url == license_url
 
 
-def check_no_args(p: Parser, err_msg_args=None) -> None:
+def check_no_args(p: Type[Parser], err_msg_args=None) -> None:
     """Helper function for checking the 'args' attribute is not present."""
     if err_msg_args is None:
         err_msg_args = "'Parser' object has no attribute 'args'"
@@ -56,7 +56,10 @@ class TestPositionalArgs:
 
     @pytest.mark.parametrize("args", [("path/to/dir", "test_ch")])
     def test_pos_args_all(
-        self, parser: Parser, args: Sequence[str], capsys: pytest.CaptureFixture
+        self,
+        parser: Type[Parser],
+        args: Sequence[str],
+        capsys: Type[pytest.CaptureFixture],
     ) -> None:
         """Test when both positional arguments are present."""
         parser.parse(args)
@@ -89,7 +92,10 @@ class TestPositionalArgs:
         ],
     )
     def test_pos_args_missing(
-        self, parser: Parser, args: Sequence[str], capsys: pytest.CaptureFixture
+        self,
+        parser: Type[Parser],
+        args: Sequence[str],
+        capsys: Type[pytest.CaptureFixture],
     ) -> None:
         """Test when only zero/one positional argument is present."""
         with pytest.raises(SystemExit):
@@ -107,7 +113,10 @@ class TestPositionalArgs:
 
     @pytest.mark.parametrize("args", [("path/to/dir", "test_ch", "0.1")])
     def test_pos_args_extra(
-        self, parser: Parser, args: Sequence[str], capsys: pytest.CaptureFixture
+        self,
+        parser: Type[Parser],
+        args: Sequence[str],
+        capsys: Type[pytest.CaptureFixture],
     ) -> None:
         """Test when more than two positional arguments are specified."""
         with pytest.raises(SystemExit):
@@ -152,7 +161,10 @@ class TestOptionalArgs:
         ],
     )
     def test_opt_args_all(
-        self, parser: Parser, args: Sequence[str], capsys: pytest.CaptureFixture
+        self,
+        parser: Type[Parser],
+        args: Sequence[str],
+        capsys: Type[pytest.CaptureFixture],
     ) -> None:
         """Test when all optional arguments are specified."""
         parser.parse(args)
@@ -179,7 +191,10 @@ class TestOptionalArgs:
         "args", [("path/to/dir", "test_ch", "--optimize-file", "0.1")]
     )
     def test_optimize_file_misspec(
-        self, parser: Parser, args: Sequence[str], capsys: pytest.CaptureFixture
+        self,
+        parser: Type[Parser],
+        args: Sequence[str],
+        capsys: Type[pytest.CaptureFixture],
     ) -> None:
         """Test when --optimize-file is misspecified."""
         with pytest.raises(SystemExit):
@@ -202,7 +217,10 @@ class TestOptionalArgs:
         ],
     )
     def test_port_bid_fee_misspec(
-        self, parser: Parser, args: Sequence[str], capsys: pytest.CaptureFixture
+        self,
+        parser: Type[Parser],
+        args: Sequence[str],
+        capsys: Type[pytest.CaptureFixture],
     ) -> None:
         """Test when --port, --bid or --fee-amount is misspecified."""
         with pytest.raises(SystemExit):
@@ -226,7 +244,10 @@ class TestOptionalArgs:
         ],
     )
     def test_port_bid_fee_extra(
-        self, parser: Parser, args: Sequence[str], capsys: pytest.CaptureFixture
+        self,
+        parser: Type[Parser],
+        args: Sequence[str],
+        capsys: Type[pytest.CaptureFixture],
     ) -> None:
         """Test when --port, --bid or --fee-amount are overspecified."""
         with pytest.raises(SystemExit):
@@ -242,7 +263,10 @@ class TestOptionalArgs:
 
     @pytest.mark.parametrize("args", [("path/to/dir", "test_ch", "--tags")])
     def test_tags_misspec(
-        self, parser: Parser, args: Sequence[str], capsys: pytest.CaptureFixture
+        self,
+        parser: Type[Parser],
+        args: Sequence[str],
+        capsys: Type[pytest.CaptureFixture],
     ) -> None:
         """Test when --tags is misspecified."""
         with pytest.raises(SystemExit):
@@ -266,7 +290,10 @@ class TestOptionalArgs:
         ],
     )
     def test_languages_misspec(
-        self, parser: Parser, args: Sequence[str], capsys: pytest.CaptureFixture
+        self,
+        parser: Type[Parser],
+        args: Sequence[str],
+        capsys: Type[pytest.CaptureFixture],
     ) -> None:
         """Test when --languages is misspecified."""
         with pytest.raises(SystemExit):
@@ -290,7 +317,10 @@ class TestOptionalArgs:
         ],
     )
     def test_license_misspec(
-        self, parser: Parser, args: Sequence[str], capsys: pytest.CaptureFixture
+        self,
+        parser: Type[Parser],
+        args: Sequence[str],
+        capsys: Type[pytest.CaptureFixture],
     ) -> None:
         """Test when --license is misspecified."""
         with pytest.raises(SystemExit):
@@ -321,7 +351,10 @@ class TestOptionalArgs:
         ],
     )
     def test_license_url_misspec(
-        self, parser: Parser, args: Sequence[str], capsys: pytest.CaptureFixture
+        self,
+        parser: Type[Parser],
+        args: Sequence[str],
+        capsys: Type[pytest.CaptureFixture],
     ) -> None:
         """Test when --license is misspecified."""
         with pytest.raises(SystemExit):
@@ -346,7 +379,10 @@ class TestOptionalArgs:
         ],
     )
     def test_license_url_missing(
-        self, parser: Parser, args: Sequence[str], capsys: pytest.CaptureFixture
+        self,
+        parser: Type[Parser],
+        args: Sequence[str],
+        capsys: Type[pytest.CaptureFixture],
     ) -> None:
         """Test when --license is misspecified."""
         with pytest.raises(SystemExit):
@@ -367,7 +403,10 @@ class TestHelpOption:
 
     @pytest.mark.parametrize("args", ["-h", "--help"])
     def test_help(
-        self, parser: Parser, args: Sequence[str], capsys: pytest.CaptureFixture
+        self,
+        parser: Type[Parser],
+        args: Sequence[str],
+        capsys: Type[pytest.CaptureFixture],
     ) -> None:
         """Test when -h or --help is specified."""
         with pytest.raises(SystemExit):

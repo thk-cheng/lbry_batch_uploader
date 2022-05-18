@@ -24,11 +24,13 @@ class TestGetFileNameNoExt:
             ("08-abcdef-ghi [biyASgmFq9Q].webm", "08-abcdef-ghi [biyASgmFq9Q]"),
         ],
     )
-    def test_correct_output(self, file_name_with_ext, file_name):
+    def test_correct_output(self, file_name_with_ext: str, file_name: str):
+        """Test that the function correctly trims off the file extension."""
         assert get_file_name_no_ext(file_name_with_ext) == file_name
 
-    def test_not_string_input(self):
-        file_name_with_ext = 123456
+    @pytest.mark.parametrize("file_name_with_ext", [(123456,)])
+    def test_not_string_input(self, file_name_with_ext: int):
+        """Test that non-string input is rejected."""
         err_msg = "file_name_with_ext must be a string"
         with pytest.raises(TypeError, match=err_msg):
             _ = get_file_name_no_ext(file_name_with_ext)
@@ -54,5 +56,6 @@ class TestGetFileNameNoExtClean:
             ),
         ],
     )
-    def test_correct_output(self, file_name_no_ext, file_name_no_ext_clean):
+    def test_correct_output(self, file_name_no_ext: str, file_name_no_ext_clean: str):
+        """Test that all invalid symbols are removed."""
         assert get_file_name_no_ext_clean(file_name_no_ext) == file_name_no_ext_clean
