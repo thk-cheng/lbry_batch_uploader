@@ -119,6 +119,8 @@ python -m lbry_batch_uploader \
     --license "Creative Commons Attribution-NonCommercial 4.0 International"
 ```
 
+n.b. If you would like to explore the full list of optional arguments that lbrynet accepts, please head to [here](https://github.com/thk-cheng/lbry_batch_uploader/tree/main/notebooks) and have fun with the notebooks!
+
 ## Developing
 
 This project uses ``black`` for code formatting and ``flake8`` for linting.
