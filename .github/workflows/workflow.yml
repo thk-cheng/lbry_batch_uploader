@@ -29,11 +29,5 @@ jobs:
     - name: Test with tox
       run: tox
 
-    - name: Download Codecov uploader
-      run: |
-        curl -Os https://uploader.codecov.io/latest/linux/codecov
-        chmod +x codecov
-        ./codecov
-
     - name: Upload coverage report to Codecov
       uses: codecov/codecov-action@v2
