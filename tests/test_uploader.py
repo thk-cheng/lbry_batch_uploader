@@ -331,6 +331,7 @@ class TestInit:
         assert base_params["channel_name"] == "@batch-upload-testing"
         assert base_params["optimize_file"]
         assert base_params["bid"] == "0.56"
+        assert base_params["fee_currency"] == "lbc"
         assert base_params["fee_amount"] == "1.23"
         assert base_params["tags"] == ["tag0", "tag1", "tag2", "tag3", "tag4"]
         assert base_params["languages"] == ["en"]
