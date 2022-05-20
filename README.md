@@ -20,7 +20,7 @@ If you find any mistakes/room for improvement, please open a [pull request](http
 Install through pip, preferably inside a virtual environment, from the terminal:
 
 ```shell
-python3 -m pip install --upgrade pip
+python -m pip install --upgrade pip
 pip install lbry_batch_uploader
 ```
 
@@ -130,8 +130,9 @@ This project uses ``black`` for code formatting and ``flake8`` for linting.
 To properly configure your local environment, please install the development dependencies and set up the commit hooks accordingly.
 
 ```shell
-python3 -m pip install -r requirements_dev.txt
-python3 -m pip install -e .
+python -m pip install --upgrade pip
+pip install -r requirements_dev.txt
+pip install -e .
 pre-commit install
 ```
 
