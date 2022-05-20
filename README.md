@@ -1,7 +1,7 @@
 # LBRY Batch Uploader
 
 ![Tests](https://github.com/thk-cheng/lbry_batch_uploader/actions/workflows/workflow.yml/badge.svg)
-![PreCommit](https://github.com/thk-cheng/lbry_batch_uploader/actions/workflows/pre-commit.yaml/badge.svg)
+![PreCommit](https://github.com/thk-cheng/lbry_batch_uploader/actions/workflows/pre-commit.yml/badge.svg)
 ![Coverage](https://img.shields.io/codecov/c/gh/thk-cheng/lbry_batch_uploader)
 ![PyVersions](https://img.shields.io/pypi/pyversions/lbry-batch-uploader)
 ![Wheel](https://img.shields.io/pypi/wheel/lbry-batch-uploader)
