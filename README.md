@@ -21,7 +21,7 @@ Install through pip, preferably inside a virtual environment, from the terminal:
 
 ```shell
 python3 -m pip install --upgrade pip
-python3 -m pip install lbry_batch_uploader
+pip install lbry_batch_uploader
 ```
 
 n.b. If you are unfamiliar with creating virtual environment, please refer to the documentation of either [venv](https://docs.python.org/3/library/venv.html) or [virtualenv](https://virtualenv.pypa.io/en/latest/).
