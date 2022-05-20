@@ -18,14 +18,15 @@ class Uploader:
             "channel_name": args.channel_name,
             "optimize_file": args.optimize_file and self._has_ffmpeg(),
             "bid": args.bid,
-            "fee_currency": "lbc",
-            "fee_amount": args.fee_amount,
             "tags": args.tags,
             "languages": args.languages,
             "license": args.license,
             "preview": False,
             "blocking": False,
         }
+        if float(args.fee_amount):
+            self.base_params["fee_currency"] = "lbc"
+            self.base_params["fee_amount"] = args.fee_amount
         if self.base_params["license"] == "Other":
             self.base_params["license_url"] = args.license_url
 
