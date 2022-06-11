@@ -61,8 +61,6 @@ This package currently does not have ``cygwin``, ``win32``, ``win64`` support. P
 
 ### Positional
 
-#### file_directory
-
 ```
 file_directory             The absolute path of the directory that contains all the files to be uploaded
 
