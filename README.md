@@ -12,6 +12,8 @@ A convenient and minimalistic batch uploader for [LBRY Desktop](https://lbry.com
 For a detail specification of the LBRY protocol, please visit https://lbry.tech/
 
 If you have any questions/suggestions, please open an [issue](https://github.com/thk-cheng/lbry_batch_uploader/issues). I am more than happy to discuss with you!
+There is also a list of ![known issues](#Known-Issues) below, which contains issues that are directly caused by how LBRY processes transactions.
+Since this project relies on the lbrynet api, these are all unavoidable issues and I could not do much on my part.
 
 If you find any mistakes/room for improvement, please open a [pull request](https://github.com/thk-cheng/lbry_batch_uploader/pulls). I will respond asap!
 
@@ -79,7 +81,7 @@ channel_name               The name of the publisher channel (with the @)
 
 --bid BID                  The amount to back the claim, default to 0.0001 if not specified.
 
---fee-amount FEE_AMOUNT    The content download fee in LBC, default to 0 if not specified.
+--fee-amount FEE_AMOUNT    The content download fee in LBC, default to 0 if not specified (i.e. free).
 
 --tags TAGS [TAGS ...]     The content tags of the claims, default to [] if not specified.
 
@@ -118,7 +120,11 @@ python -m lbry_batch_uploader \
     --license "Creative Commons Attribution-NonCommercial 4.0 International"
 ```
 
-n.b. If you would like to explore the full list of optional arguments that lbrynet accepts, please head to [here](https://github.com/thk-cheng/lbry_batch_uploader/tree/main/notebooks) for the notebooks or [here](https://lbry.tech/api/sdk) for the official lbrynet api documentation. Have fun!
+n.b. If you would like to explore the full list of optional arguments that lbrynet accepts, please head to [the exploratory notebooks](https://github.com/thk-cheng/lbry_batch_uploader/tree/main/notebooks) or [the official lbrynet api documentation](https://lbry.tech/api/sdk). Have fun!
+
+## Known Issues
+
+- The order of videos appearing in your channel might not be the same as the upload order.
 
 ## Developing
 
@@ -134,6 +140,14 @@ pip install -r requirements_dev.txt
 pip install -e .
 pre-commit install
 ```
+
+## Todos
+
+- Generate thumbnails using ffmpeg if no matching thumbnail is found for a file
+- Add a flag that will save the uploading result to a file named "uploaded.txt"
+- Add a flag that will scan the `file_directory` for "uploaded.txt", if it is found, the uploader will skip the files listed in it.
+- Use the lbrynet api to warn user for insufficient fund (i.e. < 2 LBC)
+- Catch `InsufficientFundsError` separately
 
 ## License
 
