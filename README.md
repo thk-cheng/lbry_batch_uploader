@@ -43,7 +43,6 @@ n.b. If you are unfamiliar with creating virtual environment, please refer to th
 python -m lbry_batch_uploader \
     file_directory \
     channel_name \
-    --optimize-file \
     --port PORT \
     --bid BID \
     --fee-amount FEE_AMOUNT \
@@ -65,16 +64,15 @@ E.g. if you have the following directory strucutre:
 ```
 |
 |- testing_videos
-   |
-   |- sample_video.mp4
-   |
-   |- sample_video.txt
-   |
-   |- sample_video.png
-   |
-   |- ...
-   |
-
+|   |
+|   |- sample_video.mp4
+|   |
+|   |- sample_video.txt
+|   |
+|   |- sample_video.png
+|   |
+|   |- ...
+|   |
 ```
 
 Then the uploader would automatically scan for `testing_videos` and pick up `sample_video.txt`, `sample_video.png` as the description and thumbnail for `sample_video.mp4` respectively.
@@ -105,9 +103,6 @@ channel_name               The name of the publisher channel (with the @)
 ```
 -h, --help                 Show the help message and exit
 
---optimize-file            Whether to transcode the video & audio or not, default to False if not specified.
-                           If specified, i.e. set to True, ffmpeg must first be configured properly in the LBRY Desktop.
-
 --port PORT                The port that lbrynet listens to, default to 5279 if not specified.
 
 --bid BID                  The amount to back the claim, default to 0.0001 if not specified.
@@ -136,13 +131,17 @@ channel_name               The name of the publisher channel (with the @)
 --license-url LICENSE_URL  The url of custom license. This option should be specified if and only if --license="Other".
 ```
 
+<--
+--optimize-file            Whether to transcode the video & audio or not, default to False if not specified.
+                           If specified, i.e. set to True, ffmpeg must first be configured properly in the LBRY Desktop.
+-->
+
 ### Example
 
 ```shell
 python -m lbry_batch_uploader \
     "/path/to/dir" \
     "@abc-xyz-ch" \
-    --optimize-file \
     --port 9999 \
     --bid 0.1 \
     --fee-amount 1.23 \
@@ -177,7 +176,7 @@ pre-commit install
 - Generate thumbnails using ffmpeg if no matching thumbnail is found for a file
 - Add a flag that will save the uploading result to a file named "uploaded.txt"
 - Add a flag that will scan the `file_directory` for "uploaded.txt", if it is found, the uploader will skip the files listed in it.
-- Use the lbrynet api to warn user for insufficient fund (i.e. < 2 LBC)
+- Use the lbrynet api to warn user for insufficient fund (e.g. < 2 LBC)
 - Catch `InsufficientFundsError` separately
 
 ## License
