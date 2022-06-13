@@ -11,9 +11,9 @@
 A convenient and minimalistic batch uploader for [LBRY Desktop](https://lbry.com/get) written in Python.\
 For a detail specification of the LBRY protocol, please visit https://lbry.tech/
 
-If you have any questions/suggestions, please open an [issue](https://github.com/thk-cheng/lbry_batch_uploader/issues). I am more than happy to discuss with you!
+If you have any questions/suggestions, please open an [issue](https://github.com/thk-cheng/lbry_batch_uploader/issues). I am more than happy to discuss with you!\
 There is also a list of ![known issues](#known-issues) below, which contains issues that are directly caused by how LBRY processes transactions.
-Since this project relies on the lbrynet api, these are all unavoidable issues and I could not do much on my part.
+Since this project relies on the lbrynet api, these are all unavoidable and I could not do much on my part.
 
 If you find any mistakes/room for improvement, please open a [pull request](https://github.com/thk-cheng/lbry_batch_uploader/pulls). I will respond asap!
 
@@ -54,6 +54,37 @@ python -m lbry_batch_uploader \
 ```
 
 n.b. The meaning and usage of each argument is documented in the ![following section](#arguments).
+
+#### Descriptions and Thumbnails
+
+The uploader will automatically scan for files that have the same name with the one currently being uploaded,
+but with a correct file extension of being either a description or a thumbnail.
+
+E.g. if you have the following directory strucutre:
+
+```
+|
+|- testing_videos
+   |
+   |- sample_video.mp4
+   |
+   |- sample_video.txt
+   |
+   |- sample_video.png
+   |
+   |- ...
+   |
+
+```
+
+Then the uploader would automatically scan for `testing_videos` and pick up `sample_video.txt`, `sample_video.png` as the description and thumbnail for `sample_video.mp4` respectively.
+
+The currently supported file extensions are as follows:
+
+```
+description    .txt, .description
+thumbnail      .gif, .jpg, .png
+```
 
 ### Windows
 
