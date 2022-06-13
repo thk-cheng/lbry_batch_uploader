@@ -12,7 +12,7 @@ A convenient and minimalistic batch uploader for [LBRY Desktop](https://lbry.com
 For a detail specification of the LBRY protocol, please visit https://lbry.tech/
 
 If you have any questions/suggestions, please open an [issue](https://github.com/thk-cheng/lbry_batch_uploader/issues). I am more than happy to discuss with you!
-There is also a list of ![known issues](#Known-Issues) below, which contains issues that are directly caused by how LBRY processes transactions.
+There is also a list of ![known issues](#known-issues) below, which contains issues that are directly caused by how LBRY processes transactions.
 Since this project relies on the lbrynet api, these are all unavoidable issues and I could not do much on my part.
 
 If you find any mistakes/room for improvement, please open a [pull request](https://github.com/thk-cheng/lbry_batch_uploader/pulls). I will respond asap!
