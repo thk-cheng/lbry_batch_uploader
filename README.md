@@ -11,7 +11,9 @@
 A convenient and minimalistic batch uploader for [LBRY Desktop](https://lbry.com/get) written in Python.\
 For a detail specification of the LBRY protocol, please visit https://lbry.tech/
 
-If you have any questions/suggestions, please open an [issue](https://github.com/thk-cheng/lbry_batch_uploader/issues). I am more than happy to discuss with you!
+If you have any questions/suggestions, please open an [issue](https://github.com/thk-cheng/lbry_batch_uploader/issues). I am more than happy to discuss with you!\
+There is also a list of ![known issues](#known-issues) below, which contains issues that are directly caused by how LBRY processes transactions.
+Since this project relies on the lbrynet api, these are all unavoidable and I could not do much on my part.
 
 If you find any mistakes/room for improvement, please open a [pull request](https://github.com/thk-cheng/lbry_batch_uploader/pulls). I will respond asap!
 
@@ -41,7 +43,6 @@ n.b. If you are unfamiliar with creating virtual environment, please refer to th
 python -m lbry_batch_uploader \
     file_directory \
     channel_name \
-    --optimize-file \
     --port PORT \
     --bid BID \
     --fee-amount FEE_AMOUNT \
@@ -52,6 +53,36 @@ python -m lbry_batch_uploader \
 ```
 
 n.b. The meaning and usage of each argument is documented in the ![following section](#arguments).
+
+#### Descriptions and Thumbnails
+
+The uploader will automatically scan for files that have the same name with the one currently being uploaded,
+but with a correct file extension of being either a description or a thumbnail.
+
+E.g. if you have the following directory strucutre:
+
+```
+|
+|- testing_videos
+|   |
+|   |- sample_video.mp4
+|   |
+|   |- sample_video.txt
+|   |
+|   |- sample_video.png
+|   |
+|   |- ...
+|   |
+```
+
+Then the uploader would automatically scan for `testing_videos` and pick up `sample_video.txt`, `sample_video.png` as the description and thumbnail for `sample_video.mp4` respectively.
+
+The currently supported file extensions are as follows:
+
+```
+description    .txt, .description
+thumbnail      .gif, .jpg, .png
+```
 
 ### Windows
 
@@ -72,14 +103,11 @@ channel_name               The name of the publisher channel (with the @)
 ```
 -h, --help                 Show the help message and exit
 
---optimize-file            Whether to transcode the video & audio or not, default to False if not specified.
-                           If specified, i.e. set to True, ffmpeg must first be configured properly in the LBRY Desktop.
-
 --port PORT                The port that lbrynet listens to, default to 5279 if not specified.
 
 --bid BID                  The amount to back the claim, default to 0.0001 if not specified.
 
---fee-amount FEE_AMOUNT    The content download fee in LBC, default to 0 if not specified.
+--fee-amount FEE_AMOUNT    The content download fee in LBC, default to 0 if not specified (i.e. free).
 
 --tags TAGS [TAGS ...]     The content tags of the claims, default to [] if not specified.
 
@@ -103,13 +131,17 @@ channel_name               The name of the publisher channel (with the @)
 --license-url LICENSE_URL  The url of custom license. This option should be specified if and only if --license="Other".
 ```
 
+<--
+--optimize-file            Whether to transcode the video & audio or not, default to False if not specified.
+                           If specified, i.e. set to True, ffmpeg must first be configured properly in the LBRY Desktop.
+-->
+
 ### Example
 
 ```shell
 python -m lbry_batch_uploader \
     "/path/to/dir" \
     "@abc-xyz-ch" \
-    --optimize-file \
     --port 9999 \
     --bid 0.1 \
     --fee-amount 1.23 \
@@ -118,7 +150,11 @@ python -m lbry_batch_uploader \
     --license "Creative Commons Attribution-NonCommercial 4.0 International"
 ```
 
-n.b. If you would like to explore the full list of optional arguments that lbrynet accepts, please head to [here](https://github.com/thk-cheng/lbry_batch_uploader/tree/main/notebooks) for the notebooks or [here](https://lbry.tech/api/sdk) for the official lbrynet api documentation. Have fun!
+n.b. If you would like to explore the full list of optional arguments that lbrynet accepts, please head to [the exploratory notebooks](https://github.com/thk-cheng/lbry_batch_uploader/tree/main/notebooks) or [the official lbrynet api documentation](https://lbry.tech/api/sdk). Have fun!
+
+## Known Issues
+
+- The order of videos appearing in your channel might not be the same as the upload order.
 
 ## Developing
 
@@ -134,6 +170,14 @@ pip install -r requirements_dev.txt
 pip install -e .
 pre-commit install
 ```
+
+## Todos
+
+- Generate thumbnails using ffmpeg if no matching thumbnail is found for a file
+- Add a flag that will save the uploading result to a file named "uploaded.txt"
+- Add a flag that will scan the `file_directory` for "uploaded.txt", if it is found, the uploader will skip the files listed in it.
+- Use the lbrynet api to warn user for insufficient fund (e.g. < 2 LBC)
+- Catch `InsufficientFundsError` separately
 
 ## License
 
