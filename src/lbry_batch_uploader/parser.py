@@ -97,6 +97,7 @@ class Parser:
 
         self.argparser.add_argument(
             "--license",
+            default="Public Domain",
             type=str,
             choices=LICENSES,
             help="""The publication license of the claims. \

@@ -86,7 +86,8 @@ channel_name               The name of the publisher channel (with the @)
 --languages L [L ...]      The languages of the claims in RFC5646 format, default to ["en"] if not specified.
                            More than one could be specified. Please refer to RFC5646 for the complete list.
 
---license LICENSE          The publication license of the claims. You must choose from the following list.
+--license LICENSE          The publication license of the claims, default to "Public Domain" if not specified.
+                           You must choose from the following list.
                            List of available licenses: {
                                Public Domain,
                                Creative Commons Attribution 4.0 International,
@@ -99,25 +100,25 @@ channel_name               The name of the publisher channel (with the @)
                                Other
                            }
 
---license-url LICENSE_URL  The url of custom license. This option should be specified if and only if --license='Other'.
+--license-url LICENSE_URL  The url of custom license. This option should be specified if and only if --license="Other".
 ```
 
 ### Example
 
 ```shell
 python -m lbry_batch_uploader \
-    "/Users/your_username/path/to/dir" \
-    "@batch-upload-testing" \
+    "/path/to/dir" \
+    "@abc-xyz-ch" \
     --optimize-file \
     --port 9999 \
     --bid 0.1 \
     --fee-amount 1.23 \
-    --tags "Testing" "Python" "LBRY" \
+    --tags "tag1" "tag2" "tag3" \
     --languages "en" \
     --license "Creative Commons Attribution-NonCommercial 4.0 International"
 ```
 
-n.b. If you would like to explore the full list of optional arguments that lbrynet accepts, please head to [here](https://github.com/thk-cheng/lbry_batch_uploader/tree/main/notebooks) and have fun with the notebooks!
+n.b. If you would like to explore the full list of optional arguments that lbrynet accepts, please head to [here](https://github.com/thk-cheng/lbry_batch_uploader/tree/main/notebooks) for the notebooks or [here](https://lbry.tech/api/sdk) for the official lbrynet api documentation. Have fun!
 
 ## Developing
 

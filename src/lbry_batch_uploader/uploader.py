@@ -98,9 +98,13 @@ class Uploader:
             req_info: dict = req_json[info_type]
         except KeyError as e:
             req_err = req_json["error"]
-            if req_err["data"]["name"] == "ValueError":
+            req_err_name = req_err["data"]["name"]
+            if req_err_name == "ValueError":
                 raise ValueError(req_err["message"]) from None
             else:
+                print(
+                    f"Error msg from lbrynet api:\n {req_err_name}: {req_err['message']}\n\n"
+                )
                 raise e from None
 
         return req_info

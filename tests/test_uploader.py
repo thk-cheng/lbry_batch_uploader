@@ -395,6 +395,7 @@ class TestGetReqInfo:
                 {
                     "error": {
                         "data": {"name": "OtherError"},
+                        "message": "This is a test error message.",
                     }
                 },
                 "result",
@@ -403,6 +404,7 @@ class TestGetReqInfo:
                 {
                     "error": {
                         "data": {"name": "OtherError"},
+                        "message": "This is a test error message.",
                     }
                 },
                 "data",
@@ -410,11 +412,21 @@ class TestGetReqInfo:
         ],
     )
     def test_othererrors(
-        self, uploader_normal: Type[Uploader], req_json: dict, info_type: str
+        self,
+        uploader_normal: Type[Uploader],
+        req_json: dict,
+        info_type: str,
+        capsys: Type[pytest.CaptureFixture],
     ) -> None:
         """Test the case when other exception is passed back from lbrynet."""
-        with pytest.raises(KeyError):
+        with pytest.raises(KeyError, match=f"{info_type}"):
             uploader_normal._get_req_info(req_json, info_type)
+
+        captured = capsys.readouterr()
+        out_msg_0 = "Error msg from lbrynet api:"
+        out_msg_1 = "OtherError: This is a test error message."
+        assert out_msg_0 in captured.out
+        assert out_msg_1 in captured.out
 
 
 class TestGetAllFiles:
