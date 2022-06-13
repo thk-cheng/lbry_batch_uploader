@@ -59,7 +59,7 @@ n.b. The meaning and usage of each argument is documented in the [following sect
 The uploader will automatically scan for files that have the same name with the one currently being uploaded,
 but with a correct file extension of being either a description or a thumbnail.
 
-E.g. if you have the following directory strucutre:
+E.g. if you have the following directory structure:
 
 ```
 |
@@ -131,7 +131,7 @@ channel_name               The name of the publisher channel (with the @)
 --license-url LICENSE_URL  The url of custom license. This option should be specified if and only if --license="Other".
 ```
 
-<--
+<!--
 --optimize-file            Whether to transcode the video & audio or not, default to False if not specified.
                            If specified, i.e. set to True, ffmpeg must first be configured properly in the LBRY Desktop.
 -->
@@ -155,6 +155,7 @@ n.b. If you would like to explore the full list of optional arguments that lbryn
 ## Known Issues
 
 - The order of videos appearing in your channel might not be the same as the upload order.
+- The `optimize_file` option in the `publish` method of the lbrynet api is not stable, as a result the `--optimize-file` flag is disabled for the time being.
 
 ## Developing
 
